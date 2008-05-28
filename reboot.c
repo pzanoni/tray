@@ -4,7 +4,6 @@
 #include <sys/signal.h>
 
 #define ICON_PATH "/usr/share/icons/tray_reboot/"
-//#define ICON_PATH "icons/"
 
 GtkWidget *window;
 GtkWidget *button1;
@@ -66,19 +65,28 @@ void lock()
 
 int main(int argc, char **argv)
 {
+	GtkSettingsValue sval;
 	struct GtkStatusIcon *icon1;
 #ifdef USE_SCREENSAVER
 	struct GtkStatusIcon *icon2;
 #endif
 
 	gtk_init(&argc, &argv);
-	icon1 = (struct GtkStatusIcon *)gtk_status_icon_new_from_file(ICON_PATH "exit.png");
+	icon1 = (struct GtkStatusIcon *)
+			gtk_status_icon_new_from_file(ICON_PATH "exit.png");
 	g_signal_connect(G_OBJECT(icon1), "activate", G_CALLBACK(click), NULL);
 
 #ifdef USE_SCREENSAVER
-	icon2 = (struct GtkStatusIcon *)gtk_status_icon_new_from_file(ICON_PATH "lock.png");
+	icon2 = (struct GtkStatusIcon *)
+			gtk_status_icon_new_from_file(ICON_PATH "lock.png");
 	g_signal_connect(G_OBJECT(icon2), "activate", G_CALLBACK(lock), NULL);
 #endif
+
+	sval.value.g_type = G_TYPE_INVALID;
+	g_value_init(&sval.value, G_TYPE_LONG);
+	g_value_set_long(&sval.value, TRUE);
+	gtk_settings_set_property_value(gtk_settings_get_default(),
+						"gtk-button-images", &sval);
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 30);
