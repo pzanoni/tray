@@ -1,7 +1,5 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
-#include <sys/types.h>
-#include <sys/signal.h>
 
 #ifndef ICON_DIR
 #define ICON_DIR "/usr/share/icons"
@@ -60,12 +58,15 @@ void lock()
 }
 #endif
 
-#define set_button(b,l,p,i) do { \
-  (b) = gtk_button_new_with_label(l); \
-  g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(option), (gpointer)(p)); \
-  gtk_button_set_image(GTK_BUTTON(b), gtk_image_new_from_file(ICON_PATH i)); \
-  gtk_button_set_image_position(GTK_BUTTON(b), GTK_POS_TOP); \
-} while (0)
+
+static void set_button(GtkWidget **b, char *l, int p, char *i)
+{
+	*b = gtk_button_new_with_label(l);
+	g_signal_connect(G_OBJECT(*b), "clicked", G_CALLBACK(option),
+							(gpointer)(p));
+	gtk_button_set_image(GTK_BUTTON(*b), gtk_image_new_from_file(i));
+	gtk_button_set_image_position(GTK_BUTTON(*b), GTK_POS_TOP);
+}
 
 int main(int argc, char **argv)
 {
@@ -98,11 +99,11 @@ int main(int argc, char **argv)
 	hbox1 = gtk_hbox_new(TRUE, TRUE);
 	hbox2 = gtk_hbox_new(TRUE, TRUE);
 
-	set_button(button1, "Reboot", OPT_REBOOT, "reboot.png");
-	set_button(button2, "Shutdown", OPT_SHUTDOWN, "shutdown.png");
-	set_button(button3, "Suspend", OPT_SUSPEND, "suspend.png");
-	set_button(button4, "Hibernate", OPT_HIBERNATE, "hibernate.png");
-	set_button(button5, "Cancel", OPT_CANCEL, "cancel.png");
+	set_button(&button1, "Reboot", OPT_REBOOT, ICON_PATH "reboot.png");
+	set_button(&button2, "Shutdown", OPT_SHUTDOWN, ICON_PATH "shutdown.png");
+	set_button(&button3, "Suspend", OPT_SUSPEND, ICON_PATH "suspend.png");
+	set_button(&button4, "Hibernate", OPT_HIBERNATE, ICON_PATH "hibernate.png");
+	set_button(&button5, "Cancel", OPT_CANCEL, ICON_PATH "cancel.png");
 
 	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
