@@ -28,13 +28,10 @@ all: $(BINS)
 install: $(INSTS)
 
 locale:
-	@for i in $(LANGS); do \
-		$(MAKE) _locale _LANG=$$i; \
-	done
-
-_locale:
 	@for i in $(LOCS); do \
-		$(MAKE) intl/$$i/$(_LANG).mo; \
+		for j in $(LANGS); do \
+			$(MAKE) intl/$$i/$$j.mo; \
+		done \
 	done
 
 tray_reboot: reboot.o
