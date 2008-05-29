@@ -1,9 +1,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-#ifndef ICON_DIR
-#define ICON_DIR "/usr/share/icons"
-#endif
+#include "tray.h"
 
 #define ICON_PATH ICON_DIR "/tray_reboot/"
 
@@ -61,7 +59,7 @@ void lock()
 
 static void set_button(GtkWidget **b, char *l, int p, char *i)
 {
-	*b = gtk_button_new_with_label(l);
+	*b = gtk_button_new_with_label(_(l));
 	g_signal_connect(G_OBJECT(*b), "clicked", G_CALLBACK(option),
 							(gpointer)(p));
 	gtk_button_set_image(GTK_BUTTON(*b), gtk_image_new_from_file(i));
@@ -75,6 +73,9 @@ int main(int argc, char **argv)
 #ifdef USE_SCREENSAVER
 	struct GtkStatusIcon *icon2;
 #endif
+
+	bindtextdomain("tray_reboot", LOCALE_DIR);
+	textdomain("tray_reboot");
 
 	gtk_init(&argc, &argv);
 	icon1 = (struct GtkStatusIcon *)
@@ -99,11 +100,11 @@ int main(int argc, char **argv)
 	hbox1 = gtk_hbox_new(TRUE, TRUE);
 	hbox2 = gtk_hbox_new(TRUE, TRUE);
 
-	set_button(&button1, "Reboot", OPT_REBOOT, ICON_PATH "reboot.png");
-	set_button(&button2, "Shutdown", OPT_SHUTDOWN, ICON_PATH "shutdown.png");
-	set_button(&button3, "Suspend", OPT_SUSPEND, ICON_PATH "suspend.png");
-	set_button(&button4, "Hibernate", OPT_HIBERNATE, ICON_PATH "hibernate.png");
-	set_button(&button5, "Cancel", OPT_CANCEL, ICON_PATH "cancel.png");
+	set_button(&button1, N_("Reboot"), OPT_REBOOT, ICON_PATH "reboot.png");
+	set_button(&button2, N_("Turn off"), OPT_SHUTDOWN, ICON_PATH "shutdown.png");
+	set_button(&button3, N_("Suspend"), OPT_SUSPEND, ICON_PATH "suspend.png");
+	set_button(&button4, N_("Hibernate"), OPT_HIBERNATE, ICON_PATH "hibernate.png");
+	set_button(&button5, N_("Cancel"), OPT_CANCEL, ICON_PATH "cancel.png");
 
 	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
@@ -123,4 +124,6 @@ int main(int argc, char **argv)
 #endif
 
 	gtk_main();
+
+	return 0;
 }
