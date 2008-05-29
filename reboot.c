@@ -3,7 +3,11 @@
 #include <sys/types.h>
 #include <sys/signal.h>
 
-#define ICON_PATH "/usr/share/icons/tray_reboot/"
+#ifndef ICON_DIR
+#define ICON_DIR "/usr/share/icons"
+#endif
+
+#define ICON_PATH ICON_DIR "/tray_reboot/"
 
 GtkWidget *window;
 GtkWidget *button1;
