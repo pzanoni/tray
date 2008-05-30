@@ -113,6 +113,9 @@ int main(int argc, char **argv)
 	icon2 = (struct GtkStatusIcon *)
 			gtk_status_icon_new_from_file(ICON_PATH "lock.png");
 	g_signal_connect(G_OBJECT(icon2), "activate", G_CALLBACK(lock), NULL);
+#ifdef POPUP_MENU
+	g_signal_connect(G_OBJECT(icon2), "popup-menu", G_CALLBACK(popup), NULL);
+#endif
 #endif
 
 	sval.value.g_type = G_TYPE_INVALID;
