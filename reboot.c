@@ -5,6 +5,8 @@
 
 #define ICON_PATH ICON_DIR "/tray_reboot/"
 
+#define POPUP_MENU
+
 GtkWidget *window;
 GtkWidget *button1;
 GtkWidget *button2;
@@ -13,6 +15,9 @@ GtkWidget *button4;
 GtkWidget *button5;
 GtkWidget *vbox;
 GtkWidget *hbox1, *hbox2;
+#ifdef POPUP_MENU
+GtkWidget *menu, *item;
+#endif
 
 enum {
 	OPT_REBOOT,
@@ -22,7 +27,7 @@ enum {
 	OPT_CANCEL
 };
 
-void option(GtkButton *button, int n)
+static void option(GtkButton *button, int n)
 {
 	gtk_widget_hide_all(window);
 
@@ -44,18 +49,30 @@ void option(GtkButton *button, int n)
 	}
 }
 	 
-void click()
+static void click()
 {
 	gtk_widget_show_all(window);
 }
 
 #ifdef USE_SCREENSAVER
-void lock()
+static void lock()
 {
 	system("xscreensaver -lock");
 }
 #endif
 
+#ifdef POPUP_MENU
+static void popup()
+{
+	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
+					gtk_get_current_event_time());
+}
+
+static void quit()
+{
+	gtk_main_quit();
+}
+#endif
 
 static void set_button(GtkWidget **b, char *l, int p, char *i)
 {
@@ -81,6 +98,16 @@ int main(int argc, char **argv)
 	icon1 = (struct GtkStatusIcon *)
 			gtk_status_icon_new_from_file(ICON_PATH "exit.png");
 	g_signal_connect(G_OBJECT(icon1), "activate", G_CALLBACK(click), NULL);
+
+#ifdef POPUP_MENU
+	item = gtk_menu_item_new_with_label(N_("Quit"));
+	menu = gtk_menu_new();
+	gtk_widget_show(item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+
+	g_signal_connect(G_OBJECT(icon1), "popup-menu", G_CALLBACK(popup), NULL);
+	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(quit), NULL);
+#endif
 
 #ifdef USE_SCREENSAVER
 	icon2 = (struct GtkStatusIcon *)
