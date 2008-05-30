@@ -36,12 +36,11 @@ locale:
 
 tray_reboot: reboot.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
-	strip $@
 
 tray_reboot-install: tray_reboot
 	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_reboot
 	$(INSTALL) -m644 icons/tray_reboot/*.png $(DESTDIR)$(ICONDIR)/tray_reboot
-	$(INSTALL) -m755 tray_reboot $(DESTDIR)$(BINDIR)
+	$(INSTALL) -m755 -s tray_reboot $(DESTDIR)$(BINDIR)
 	for i in $(LANGS); do \
 		$(INSTALL) -m644 -D intl/tray_reboot/$$i.mo \
 			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/tray_reboot.mo; \
