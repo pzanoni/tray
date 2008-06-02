@@ -52,6 +52,7 @@ static void option(GtkButton *button, int n)
 static void click()
 {
 	gtk_widget_show_all(window);
+	gdk_window_raise(window->window);
 }
 
 #ifdef USE_SCREENSAVER
