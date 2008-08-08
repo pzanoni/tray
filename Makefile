@@ -5,14 +5,14 @@ LOCALEDIR = /usr/share/locale
 
 
 CC	= gcc
-CFLAGS	= -Wall -O2 `pkg-config --cflags gtk+-2.0` -DICON_DIR=\"$(ICONDIR)\" \
-	  -DLOCALE_DIR=\"$(LOCALEDIR)\"
+CFLAGS	= -Wall -O2 -DICON_DIR=\"$(ICONDIR)\" -DLOCALE_DIR=\"$(LOCALEDIR)\" \
+	  `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` 
 LD	= gcc
 LDFLAGS	=
-LIBS	= `pkg-config --libs gtk+-2.0`
+LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
-BINS	= tray_reboot
+BINS	= tray_reboot tray_keyboard
 INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
 LANGS	= pt_BR
@@ -35,6 +35,9 @@ locale:
 	done
 
 tray_reboot: reboot.o
+	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
+
+tray_keyboard: keyboard.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
 
 tray_reboot-install: tray_reboot
