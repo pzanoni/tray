@@ -60,7 +60,6 @@ static void check_status(struct indicator *ind)
 	ind->val = !!(state & ind->mask);
 
 	if (ind->oldval != ind->val) {
-		printf("Switch to %d!\n", ind->val);
 		gtk_status_icon_set_from_file(ind->icon, ind->name[ind->val]);
 		ind->oldval = ind->val;
 	}
