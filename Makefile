@@ -50,9 +50,13 @@ tray_reboot-install: tray_reboot
 	done
 
 tray_keyleds-install: tray_keyleds
-	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_reboot
+	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_keyleds
 	$(INSTALL) -m644 icons/tray_keyleds/*.png $(DESTDIR)$(ICONDIR)/tray_keyleds
 	$(INSTALL) -m755 -s tray_keyleds $(DESTDIR)$(BINDIR)
+	for i in $(LANGS); do \
+		$(INSTALL) -m644 -D intl/tray_keyleds/$$i.mo \
+			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/tray_keyleds.mo; \
+	done
 	
 clean:
 	rm -f core *.o *~ intl/*/*.mo
