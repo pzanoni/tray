@@ -7,7 +7,7 @@
 
 #include "tray.h"
 
-#define ICON_PATH ICON_DIR "/tray_keyboard/"
+#define ICON_PATH ICON_DIR "/tray_keyleds/"
 #undef POPUP_MENU
 
 struct indicator {
@@ -69,8 +69,8 @@ int main(int argc, char **argv)
 {
 	struct indicator caps, num;
 
-	bindtextdomain("tray_keyboard", LOCALE_DIR);
-	textdomain("tray_keyboard");
+	bindtextdomain("tray_keyleds", LOCALE_DIR);
+	textdomain("tray_keyleds");
 
 	gtk_init(&argc, &argv);
 
