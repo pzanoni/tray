@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
+#include <X11/Xlib.h>
 
 #include "tray.h"
 
@@ -45,6 +47,8 @@ static void option(GtkButton *button, int n)
 		system("pm-hibernate");
 		break;
 	case OPT_CANCEL:
+		gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+		gdk_pointer_ungrab(GDK_CURRENT_TIME);
 		break;
 	}
 }
@@ -52,6 +56,8 @@ static void option(GtkButton *button, int n)
 static void click()
 {
 	gtk_widget_show_all(window);
+	gdk_keyboard_grab(window->window, TRUE, GDK_CURRENT_TIME);
+	gdk_pointer_grab(window->window, TRUE, 0, NULL, NULL, GDK_CURRENT_TIME);
 	gdk_window_raise(window->window);
 }
 
