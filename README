@@ -1,4 +1,10 @@
 
+Quick-and-dirty systray applications
+
+- tray_reboot: show a reboot menu (for fastinit-based netbooks)
+- tray_keyboard: show capslock/numlock status for systems without LEDs
+
+
 Icons are from the Crystal icon set and are distributed under LGPL.
 
 
