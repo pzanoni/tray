@@ -12,7 +12,7 @@ LDFLAGS	=
 LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
-BINS	= tray_reboot tray_keyboard
+BINS	= tray_reboot tray_keyleds
 INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
 LANGS	= pt_BR
@@ -37,7 +37,7 @@ locale:
 tray_reboot: reboot.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
 
-tray_keyboard: keyboard.o
+tray_keyleds: keyleds.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
 
 tray_reboot-install: tray_reboot
