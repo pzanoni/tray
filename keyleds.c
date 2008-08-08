@@ -8,7 +8,7 @@
 #include "tray.h"
 
 #define ICON_PATH ICON_DIR "/tray_keyleds/"
-#undef POPUP_MENU
+#define POPUP_MENU
 
 struct indicator {
 	GtkStatusIcon *icon;
@@ -24,6 +24,7 @@ static Window rootwin;
 GtkWidget *menu, *item;
 #endif
 
+static int cancel;
 
 #ifdef POPUP_MENU
 static void popup()
@@ -34,7 +35,8 @@ static void popup()
 
 static void quit()
 {
-	gtk_main_quit();
+	//gtk_main_quit();
+	cancel = 1;
 }
 #endif
 
@@ -76,6 +78,7 @@ int main(int argc, char **argv)
 
 	display = GDK_DISPLAY();
 	rootwin = GDK_ROOT_WINDOW();
+	cancel = 0;
 
 	init_ind(&caps, ICON_PATH "caps0.png", ICON_PATH "caps1.png", 66, 0x01);
 	init_ind(&num, ICON_PATH "num0.png", ICON_PATH "num1.png", 77, 0x02);
@@ -95,8 +98,8 @@ int main(int argc, char **argv)
 	do {
 		check_status(&caps);
 		check_status(&num);
-	} while (gtk_main_iteration());
-
+		gtk_main_iteration();
+	} while (!cancel);
 
 	return 0;
 }
