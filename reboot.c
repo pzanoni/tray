@@ -59,6 +59,7 @@ static void click()
 	gdk_keyboard_grab(window->window, TRUE, GDK_CURRENT_TIME);
 	gdk_pointer_grab(window->window, TRUE, 0, NULL, NULL, GDK_CURRENT_TIME);
 	gdk_window_raise(window->window);
+	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 }
 
 #ifdef USE_SCREENSAVER
