@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
+#include <getopt.h>
 
 #include "tray.h"
 
@@ -98,9 +99,18 @@ int main(int argc, char **argv)
 #ifdef USE_SCREENSAVER
 	struct GtkStatusIcon *icon2;
 #endif
+	int o, susp = 1;
 
 	bindtextdomain("tray_reboot", LOCALE_DIR);
 	textdomain("tray_reboot");
+
+	while ((o = getopt(argc, argv, "s")) >= 0) {
+		switch (o) {
+		case 's':
+			susp = 0;
+			break;
+		}
+	}
 
 	gtk_init(&argc, &argv);
 	icon1 = (struct GtkStatusIcon *)
@@ -146,12 +156,15 @@ int main(int argc, char **argv)
 
 	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
-	gtk_container_add(GTK_CONTAINER(vbox), hbox2);
-
 	gtk_container_add(GTK_CONTAINER(hbox1), button1);
 	gtk_container_add(GTK_CONTAINER(hbox1), button2);
-	gtk_container_add(GTK_CONTAINER(hbox2), button3);
-	gtk_container_add(GTK_CONTAINER(hbox2), button4);
+
+	if (susp) {
+		gtk_container_add(GTK_CONTAINER(vbox), hbox2);
+		gtk_container_add(GTK_CONTAINER(hbox2), button3);
+		gtk_container_add(GTK_CONTAINER(hbox2), button4);
+	}
+
 	gtk_container_add(GTK_CONTAINER(vbox), button5);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
