@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
+#include <gdk/gdkkeysyms.h>
 #include <X11/Xlib.h>
 #include <getopt.h>
 
@@ -57,8 +58,8 @@ static void option(GtkButton *button, int n)
 static void click()
 {
 	gtk_widget_show_all(window);
-	gdk_keyboard_grab(window->window, TRUE, GDK_CURRENT_TIME);
 	gdk_pointer_grab(window->window, TRUE, 0, NULL, NULL, GDK_CURRENT_TIME);
+	gdk_keyboard_grab(window->window, TRUE, GDK_CURRENT_TIME);
 	gdk_window_raise(window->window);
 	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 }
@@ -82,6 +83,15 @@ static void quit()
 	gtk_main_quit();
 }
 #endif
+
+static void keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
+{
+	if (event->keyval == GDK_Escape) {
+		gtk_widget_hide_all(window);
+		gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+		gdk_pointer_ungrab(GDK_CURRENT_TIME);
+	}
+}
 
 static void set_button(GtkWidget **b, char *l, int p, char *i)
 {
@@ -147,6 +157,8 @@ int main(int argc, char **argv)
 	vbox = gtk_vbox_new(TRUE, TRUE);
 	hbox1 = gtk_hbox_new(TRUE, TRUE);
 	hbox2 = gtk_hbox_new(TRUE, TRUE);
+	g_signal_connect(G_OBJECT(window), "key-press-event",
+						G_CALLBACK(keypress), NULL);
 
 	set_button(&button1, N_("Reboot"), OPT_REBOOT, ICON_PATH "reboot.png");
 	set_button(&button2, N_("Turn off"), OPT_SHUTDOWN, ICON_PATH "shutdown.png");
