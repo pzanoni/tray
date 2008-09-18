@@ -12,7 +12,7 @@ LDFLAGS	=
 LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
-BINS	= tray_reboot tray_keyleds
+BINS	= tray_reboot tray_keyleds tray_mixer
 INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
 LANGS	= pt_BR
@@ -39,6 +39,9 @@ tray_reboot: reboot.o
 
 tray_keyleds: keyleds.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
+
+tray_mixer: mixer.o
+	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS) -lasound
 
 tray_reboot-install: tray_reboot
 	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_reboot
