@@ -16,8 +16,10 @@ struct channel {
 	GtkWidget *vscale;
 	guint vscale_handler;
 	GtkWidget *mute;
+	int muteval;
 };
 
+GtkStatusIcon *icon;
 GtkWidget *window;
 GtkWidget *hbox;
 GtkWidget *menu, *item;
@@ -78,9 +80,31 @@ static void mixer_set(struct channel *c, int vol)
 				SND_MIXER_SCHN_FRONT_RIGHT, vol);
 }
 
+static void update(struct channel *c)
+{
+	snd_mixer_selem_get_playback_switch(elem, 0, &c->muteval);
+
+	/* FIXME: only for master */
+        gtk_status_icon_set_from_file(icon, c->muteval ?
+			ICON_PATH "mute.png" : ICON_PATH "speaker.png");
+
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c->mute), c->muteval);
+	gtk_range_set_value(GTK_RANGE(c->vscale), mixer_get(c));
+}
+
 static void vol_change(GtkRange *range, struct channel *c)
 {
 	mixer_set(c, gtk_range_get_value(range));
+}
+
+static void mute(GtkWidget *widget, struct channel *c)
+{
+	int i, val;
+
+	val = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+printf("val = %d\n", val);
+	for (i = 0; i <= SND_MIXER_SCHN_LAST; i++)
+		snd_mixer_selem_set_playback_switch(elem, i, !val);
 }
 
 static int scale_scroll(GtkScale* scale, GdkEventScroll *e, struct channel *c)
@@ -120,8 +144,6 @@ static void quit()
 
 int main(int argc, char **argv)
 {
-	struct GtkStatusIcon *icon;
-
 	bindtextdomain("tray_mixer", LOCALE_DIR);
 	textdomain("tray_mixer");
 
@@ -129,8 +151,7 @@ int main(int argc, char **argv)
 
 	mixer_init();
 
-	icon = (struct GtkStatusIcon *)
-			gtk_status_icon_new_from_file(ICON_PATH "speaker.png");
+	icon = gtk_status_icon_new_from_file(ICON_PATH "speaker.png");
 	g_signal_connect(G_OBJECT(icon), "activate", G_CALLBACK(click), NULL);
 
 	item = gtk_menu_item_new_with_label(N_("Quit"));
@@ -150,21 +171,29 @@ int main(int argc, char **argv)
 					GDK_WINDOW_TYPE_HINT_DIALOG);
 	gtk_window_set_default_size(GTK_WINDOW(window), 60, 140);
 
-	hbox = gtk_hbox_new(TRUE, TRUE);
+	hbox = gtk_hbox_new(TRUE, 5);
 	gtk_container_add(GTK_CONTAINER(window), hbox);
 
-	ch[0].vbox = gtk_vbox_new(TRUE, TRUE);
+	/* TODO: make generic function for ch[n] */
+	ch[0].vbox = gtk_vbox_new(FALSE, 5);
 	ch[0].vscale = gtk_vscale_new(GTK_ADJUSTMENT(
 		gtk_adjustment_new(mixer_get(&ch[0]), 0, 100, 0, 0, 0)));
 	gtk_scale_set_draw_value(GTK_SCALE(ch[0].vscale), FALSE);
 	gtk_range_set_inverted(GTK_RANGE(ch[0].vscale), TRUE);
 	gtk_container_add(GTK_CONTAINER(hbox), ch[0].vbox);
-	gtk_container_add(GTK_CONTAINER(ch[0].vbox), ch[0].vscale);
+	gtk_box_pack_start(GTK_BOX(ch[0].vbox), ch[0].vscale, TRUE, TRUE, 0);
 
 	ch[0].vscale_handler = g_signal_connect((gpointer)ch[0].vscale,
 			"value_changed", G_CALLBACK(vol_change), &ch[0]);
 	g_signal_connect(ch[0].vscale,
 			"scroll-event", G_CALLBACK(scale_scroll), &ch[0]);
+
+	ch[0].mute = gtk_check_button_new_with_label("Mute");
+	g_signal_connect((gpointer)ch[0].mute, "toggled",
+					G_CALLBACK(mute), &ch[0]);
+	gtk_box_pack_end(GTK_BOX(ch[0].vbox), ch[0].mute, FALSE, FALSE, 0);
+	
+	update(&ch[0]);
 
 	gtk_status_icon_set_visible(GTK_STATUS_ICON(icon), TRUE);
 
