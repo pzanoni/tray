@@ -16,7 +16,6 @@ struct channel {
 	GtkWidget *vscale;
 	guint vscale_handler;
 	GtkWidget *mute;
-	long min, max;
 };
 
 GtkWidget *window;
@@ -31,7 +30,8 @@ snd_mixer_selem_id_t *sid;
 
 static int mixer_init()
 {
-	snd_mixer_elem_t *e;
+	int n;
+	struct pollfd *fds;
 
 	snd_mixer_selem_id_alloca(&sid);
 	if (snd_mixer_open(&mixer, 0) < 0) {
@@ -49,33 +49,38 @@ static int mixer_init()
 		exit(1);
 	}
 
-	snd_mixer_selem_get_playback_volume_range(elem, &ch[0].min, &ch[0].max);
+	snd_mixer_selem_set_playback_volume_range(elem, 0, 100);
+
+	n = snd_mixer_poll_descriptors_count(mixer);
+	fds = calloc(n, sizeof(struct pollfd));
+	snd_mixer_poll_descriptors(mixer, fds, n);
 
 	return 0;
 }
 
 static int mixer_get(struct channel *c)
 {
-	long l = snd_mixer_selem_get_playback_volume(elem,
+	long l, r;
+
+	snd_mixer_selem_get_playback_volume(elem,
 				SND_MIXER_SCHN_FRONT_LEFT, &l);
-	long r = snd_mixer_selem_get_playback_volume(elem,
+	snd_mixer_selem_get_playback_volume(elem,
 				SND_MIXER_SCHN_FRONT_RIGHT, &r);
 
-	printf("%ld, %ld\n", l, r);
 	return (l + r) / 2;
 }
 
 static void mixer_set(struct channel *c, int vol)
 {
-	snd_mixer_selem_set_playback_volume(elem, SND_MIXER_SCHN_FRONT_LEFT, vol);
-	snd_mixer_selem_set_playback_volume(elem, SND_MIXER_SCHN_FRONT_RIGHT, vol);
-mixer_get(c);
+	snd_mixer_selem_set_playback_volume(elem,
+				SND_MIXER_SCHN_FRONT_LEFT, vol);
+	snd_mixer_selem_set_playback_volume(elem,
+				SND_MIXER_SCHN_FRONT_RIGHT, vol);
 }
 
 static void vol_change(GtkRange *range, struct channel *c)
 {
-	int vol = c->max * gtk_range_get_value(range) / 100;
-	mixer_set(c, vol);
+	mixer_set(c, gtk_range_get_value(range));
 }
 
 static int scale_scroll(GtkScale* scale, GdkEventScroll *e, struct channel *c)
