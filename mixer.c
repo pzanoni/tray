@@ -5,7 +5,7 @@
 #include <X11/Xlib.h>
 #include <alsa/asoundlib.h>
 #include <alsa/mixer.h>
-
+#include <getopt.h>
 
 #include "tray.h"
 
@@ -14,7 +14,6 @@
 struct channel {
 	GtkWidget *vbox;
 	GtkWidget *vscale;
-	guint vscale_handler;
 	GtkWidget *mute;
 	int muteval;
 };
@@ -30,7 +29,7 @@ snd_mixer_selem_id_t *sid;
 
 	 
 
-static int mixer_init()
+static int mixer_init(char *name)
 {
 	int n;
 	struct pollfd *fds;
@@ -44,7 +43,7 @@ static int mixer_init()
 	snd_mixer_selem_register(mixer, NULL, NULL);
 	snd_mixer_load(mixer);
 	
-	snd_mixer_selem_id_set_name(sid, "PCM");
+	snd_mixer_selem_id_set_name(sid, name);
 	elem = snd_mixer_find_selem(mixer, sid);
 	if (!elem) {
 		fprintf(stderr, "can't find PCM element\n");
@@ -80,15 +79,34 @@ static void mixer_set(struct channel *c, int vol)
 				SND_MIXER_SCHN_FRONT_RIGHT, vol);
 }
 
-static void update(struct channel *c)
+static void mixer_getmute(struct channel *c)
 {
-	snd_mixer_selem_get_playback_switch(elem, 0, &c->muteval);
+	if (c->mute) {
+		snd_mixer_selem_get_playback_switch(elem,
+				SND_MIXER_SCHN_FRONT_LEFT, &c->muteval);
+	} else {
+		c->muteval = 1;
+	}
+}
 
-	/* FIXME: only for master */
+static void update_icon(struct channel *c)
+{
         gtk_status_icon_set_from_file(icon, c->muteval ?
-			ICON_PATH "mute.png" : ICON_PATH "speaker.png");
+			ICON_PATH "speaker.png" : ICON_PATH "mute.png");
+}
 
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c->mute), c->muteval);
+static void update_gui(struct channel *c)
+{
+	mixer_getmute(c);
+	update_icon(c);
+
+	if (c->mute) {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c->mute),
+					!c->muteval);
+	} else {
+		c->muteval = 1;
+	}
+
 	gtk_range_set_value(GTK_RANGE(c->vscale), mixer_get(c));
 }
 
@@ -99,12 +117,14 @@ static void vol_change(GtkRange *range, struct channel *c)
 
 static void mute(GtkWidget *widget, struct channel *c)
 {
-	int i, val;
+	int val, i;
 
 	val = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
-printf("val = %d\n", val);
 	for (i = 0; i <= SND_MIXER_SCHN_LAST; i++)
 		snd_mixer_selem_set_playback_switch(elem, i, !val);
+
+	mixer_getmute(c);
+	update_icon(c);
 }
 
 static int scale_scroll(GtkScale* scale, GdkEventScroll *e, struct channel *c)
@@ -144,12 +164,23 @@ static void quit()
 
 int main(int argc, char **argv)
 {
+	int o;
+	char *name = "Master";
+
 	bindtextdomain("tray_mixer", LOCALE_DIR);
 	textdomain("tray_mixer");
 
+	while ((o = getopt(argc, argv, "e:")) >= 0) {
+		switch (o) {
+		case 'e':
+			name = optarg;
+			break;
+		}
+	}
+
 	gtk_init(&argc, &argv);
 
-	mixer_init();
+	mixer_init(name);
 
 	icon = gtk_status_icon_new_from_file(ICON_PATH "speaker.png");
 	g_signal_connect(G_OBJECT(icon), "activate", G_CALLBACK(click), NULL);
@@ -183,17 +214,19 @@ int main(int argc, char **argv)
 	gtk_container_add(GTK_CONTAINER(hbox), ch[0].vbox);
 	gtk_box_pack_start(GTK_BOX(ch[0].vbox), ch[0].vscale, TRUE, TRUE, 0);
 
-	ch[0].vscale_handler = g_signal_connect((gpointer)ch[0].vscale,
+	g_signal_connect((gpointer)ch[0].vscale,
 			"value_changed", G_CALLBACK(vol_change), &ch[0]);
 	g_signal_connect(ch[0].vscale,
 			"scroll-event", G_CALLBACK(scale_scroll), &ch[0]);
 
-	ch[0].mute = gtk_check_button_new_with_label("Mute");
-	g_signal_connect((gpointer)ch[0].mute, "toggled",
-					G_CALLBACK(mute), &ch[0]);
-	gtk_box_pack_end(GTK_BOX(ch[0].vbox), ch[0].mute, FALSE, FALSE, 0);
+	if (snd_mixer_selem_has_playback_switch(elem)) {
+		ch[0].mute = gtk_check_button_new_with_label("Mute");
+		g_signal_connect((gpointer)ch[0].mute,
+				"toggled", G_CALLBACK(mute), &ch[0]);
+		gtk_box_pack_end(GTK_BOX(ch[0].vbox), ch[0].mute, FALSE, FALSE, 0);
+	}
 	
-	update(&ch[0]);
+	update_gui(&ch[0]);
 
 	gtk_status_icon_set_visible(GTK_STATUS_ICON(icon), TRUE);
 

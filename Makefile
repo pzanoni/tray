@@ -4,7 +4,7 @@ ICONDIR	= /usr/share/icons
 LOCALEDIR = /usr/share/locale
 
 
-CC	= gcc
+CC	= gcc -g
 CFLAGS	= -Wall -O2 -DICON_DIR=\"$(ICONDIR)\" -DLOCALE_DIR=\"$(LOCALEDIR)\" \
 	  `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` 
 LD	= gcc
