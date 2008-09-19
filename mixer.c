@@ -35,8 +35,9 @@ static int mixer_init(char *name)
 	struct pollfd *fds;
 
 	snd_mixer_selem_id_alloca(&sid);
-	while (snd_mixer_open(&mixer, 0) < 0) {
-		sleep(1);
+	if (snd_mixer_open(&mixer, 0) < 0) {
+		fprintf(stderr, "can't open mixer\n");
+		exit(1);
 	}
 	snd_mixer_attach(mixer, "default");
 	snd_mixer_selem_register(mixer, NULL, NULL);

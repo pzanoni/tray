@@ -61,6 +61,15 @@ tray_keyleds-install: tray_keyleds
 			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/tray_keyleds.mo; \
 	done
 	
+tray_mixer-install: tray_mixer
+	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_mixer
+	$(INSTALL) -m644 icons/tray_mixer/*.png $(DESTDIR)$(ICONDIR)/tray_mixer
+	$(INSTALL) -m755 -s tray_mixer $(DESTDIR)$(BINDIR)
+	for i in $(LANGS); do \
+		$(INSTALL) -m644 -D intl/tray_mixer/$$i.mo \
+			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/tray_mixer.mo; \
+	done
+	
 clean:
 	rm -f core *.o *~ intl/*/*.mo
 
