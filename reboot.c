@@ -109,15 +109,18 @@ int main(int argc, char **argv)
 #ifdef USE_SCREENSAVER
 	struct GtkStatusIcon *icon2;
 #endif
-	int o, susp = 1;
+	int o, susp = 1, direct = 0;
 
 	bindtextdomain("tray_reboot", LOCALE_DIR);
 	textdomain("tray_reboot");
 
-	while ((o = getopt(argc, argv, "s")) >= 0) {
+	while ((o = getopt(argc, argv, "sd")) >= 0) {
 		switch (o) {
 		case 's':
 			susp = 0;
+			break;
+		case 'd':
+			direct = 1;
 			break;
 		}
 	}
@@ -181,10 +184,18 @@ int main(int argc, char **argv)
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
 
-	gtk_status_icon_set_visible(GTK_STATUS_ICON(icon1), TRUE);
+	if (direct) {
+		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon1), FALSE);
 #ifdef USE_SCREENSAVER
-	gtk_status_icon_set_visible(GTK_STATUS_ICON(icon2), TRUE);
+		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon2), FALSE);
 #endif
+		click();
+	} else {
+		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon1), TRUE);
+#ifdef USE_SCREENSAVER
+		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon2), TRUE);
+#endif
+	}
 
 	gtk_main();
 
