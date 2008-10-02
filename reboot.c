@@ -9,8 +9,6 @@
 
 #define ICON_PATH ICON_DIR "/tray_reboot/"
 
-#define POPUP_MENU
-
 GtkWidget *window;
 GtkWidget *button1;
 GtkWidget *button2;
@@ -19,9 +17,7 @@ GtkWidget *button4;
 GtkWidget *button5;
 GtkWidget *vbox;
 GtkWidget *hbox1, *hbox2;
-#ifdef POPUP_MENU
 GtkWidget *menu, *item;
-#endif
 
 enum {
 	OPT_REBOOT,
@@ -71,7 +67,6 @@ static void lock()
 }
 #endif
 
-#ifdef POPUP_MENU
 static void popup()
 {
 	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
@@ -82,7 +77,6 @@ static void quit()
 {
 	gtk_main_quit();
 }
-#endif
 
 static void keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
@@ -130,7 +124,6 @@ int main(int argc, char **argv)
 			gtk_status_icon_new_from_file(ICON_PATH "exit.png");
 	g_signal_connect(G_OBJECT(icon1), "activate", G_CALLBACK(click), NULL);
 
-#ifdef POPUP_MENU
 	item = gtk_menu_item_new_with_label(N_("Quit"));
 	menu = gtk_menu_new();
 	gtk_widget_show(item);
@@ -138,15 +131,12 @@ int main(int argc, char **argv)
 
 	g_signal_connect(G_OBJECT(icon1), "popup-menu", G_CALLBACK(popup), NULL);
 	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(quit), NULL);
-#endif
 
 #ifdef USE_SCREENSAVER
 	icon2 = (struct GtkStatusIcon *)
 			gtk_status_icon_new_from_file(ICON_PATH "lock.png");
 	g_signal_connect(G_OBJECT(icon2), "activate", G_CALLBACK(lock), NULL);
-#ifdef POPUP_MENU
 	g_signal_connect(G_OBJECT(icon2), "popup-menu", G_CALLBACK(popup), NULL);
-#endif
 #endif
 
 	sval.value.g_type = G_TYPE_INVALID;
