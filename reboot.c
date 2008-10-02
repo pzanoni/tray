@@ -37,10 +37,10 @@ static void option(GtkButton *button, int n)
 
 	switch (n) {
 	case OPT_REBOOT:
-		system("shutdown_helper 1");
+		system("reboot");
 		break;
 	case OPT_SHUTDOWN:
-		system("shutdown_helper 2");
+		system("halt");
 		break;
 	case OPT_SUSPEND:
 		system("pm-suspend");
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 						"gtk-button-images", &sval);
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_container_set_border_width(GTK_CONTAINER(window), 30);
+	gtk_container_set_border_width(GTK_CONTAINER(window), 15);
 	vbox = gtk_vbox_new(TRUE, TRUE);
 	hbox1 = gtk_hbox_new(TRUE, TRUE);
 	hbox2 = gtk_hbox_new(TRUE, TRUE);
