@@ -18,6 +18,7 @@ GtkWidget *button5;
 GtkWidget *vbox;
 GtkWidget *hbox1, *hbox2;
 GtkWidget *menu, *item;
+int susp = 1, direct = 0, screensaver = 0;
 
 enum {
 	OPT_REBOOT,
@@ -47,6 +48,8 @@ static void option(GtkButton *button, int n)
 	case OPT_CANCEL:
 		gdk_keyboard_ungrab(GDK_CURRENT_TIME);
 		gdk_pointer_ungrab(GDK_CURRENT_TIME);
+		if (direct)
+			exit(0);
 		break;
 	}
 }
@@ -99,7 +102,7 @@ int main(int argc, char **argv)
 	GtkSettingsValue sval;
 	struct GtkStatusIcon *icon1;
 	struct GtkStatusIcon *icon2;
-	int o, susp = 1, direct = 0, screensaver = 0;
+	int o;
 
 	bindtextdomain("tray_reboot", LOCALE_DIR);
 	textdomain("tray_reboot");
