@@ -60,12 +60,10 @@ static void click()
 	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 }
 
-#ifdef USE_SCREENSAVER
 static void lock()
 {
 	system("xscreensaver -lock");
 }
-#endif
 
 static void popup()
 {
@@ -100,16 +98,17 @@ int main(int argc, char **argv)
 {
 	GtkSettingsValue sval;
 	struct GtkStatusIcon *icon1;
-#ifdef USE_SCREENSAVER
 	struct GtkStatusIcon *icon2;
-#endif
-	int o, susp = 1, direct = 0;
+	int o, susp = 1, direct = 0, screensaver = 0;
 
 	bindtextdomain("tray_reboot", LOCALE_DIR);
 	textdomain("tray_reboot");
 
-	while ((o = getopt(argc, argv, "sd")) >= 0) {
+	while ((o = getopt(argc, argv, "Ssd")) >= 0) {
 		switch (o) {
+		case 'S':
+			screensaver = 1;
+			break;
 		case 's':
 			susp = 0;
 			break;
@@ -120,24 +119,32 @@ int main(int argc, char **argv)
 	}
 
 	gtk_init(&argc, &argv);
-	icon1 = (struct GtkStatusIcon *)
+
+	if (!direct) {
+		icon1 = (struct GtkStatusIcon *)
 			gtk_status_icon_new_from_file(ICON_PATH "exit.png");
-	g_signal_connect(G_OBJECT(icon1), "activate", G_CALLBACK(click), NULL);
+		g_signal_connect(G_OBJECT(icon1), "activate",
+						G_CALLBACK(click), NULL);
 
-	item = gtk_menu_item_new_with_label(N_("Quit"));
-	menu = gtk_menu_new();
-	gtk_widget_show(item);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		item = gtk_menu_item_new_with_label(N_("Quit"));
+		menu = gtk_menu_new();
+		gtk_widget_show(item);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
-	g_signal_connect(G_OBJECT(icon1), "popup-menu", G_CALLBACK(popup), NULL);
-	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(quit), NULL);
+		g_signal_connect(G_OBJECT(icon1), "popup-menu",
+						G_CALLBACK(popup), NULL);
+		g_signal_connect(G_OBJECT(item), "activate",
+						G_CALLBACK(quit), NULL);
 
-#ifdef USE_SCREENSAVER
-	icon2 = (struct GtkStatusIcon *)
-			gtk_status_icon_new_from_file(ICON_PATH "lock.png");
-	g_signal_connect(G_OBJECT(icon2), "activate", G_CALLBACK(lock), NULL);
-	g_signal_connect(G_OBJECT(icon2), "popup-menu", G_CALLBACK(popup), NULL);
-#endif
+		if (screensaver) {
+			icon2 = (struct GtkStatusIcon *)
+				gtk_status_icon_new_from_file(ICON_PATH "lock.png");
+			g_signal_connect(G_OBJECT(icon2), "activate",
+						G_CALLBACK(lock), NULL);
+			g_signal_connect(G_OBJECT(icon2), "popup-menu",
+						G_CALLBACK(popup), NULL);
+		}
+	}
 
 	sval.value.g_type = G_TYPE_INVALID;
 	g_value_init(&sval.value, G_TYPE_LONG);
@@ -175,16 +182,11 @@ int main(int argc, char **argv)
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
 
 	if (direct) {
-		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon1), FALSE);
-#ifdef USE_SCREENSAVER
-		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon2), FALSE);
-#endif
 		click();
 	} else {
 		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon1), TRUE);
-#ifdef USE_SCREENSAVER
-		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon2), TRUE);
-#endif
+		if (screensaver)
+			gtk_status_icon_set_visible(GTK_STATUS_ICON(icon2), TRUE);
 	}
 
 	gtk_main();
