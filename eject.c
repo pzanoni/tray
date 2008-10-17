@@ -10,7 +10,9 @@
 #include <libhal.h>
 
 #define ICON_PATH ICON_DIR "/tray_reboot/"
+#define MEDIA_DIR "/media/"
 #define CMD_SIZE 256
+
 
 GHashTable *dev;
 GtkWidget *menu, *item;
@@ -39,7 +41,6 @@ void value_destroy(gpointer data)
 void add_mount(const char *udi, char *mountpoint)
 {
 	struct mdev *m;
-	printf("udi = %s, mountpoint = %s\n", udi, mountpoint);
 
 	if ((m = malloc(sizeof(*m))) == NULL) {
 		perror("malloc");
@@ -50,7 +51,7 @@ void add_mount(const char *udi, char *mountpoint)
 		return;
 	}
 
-	m->item = gtk_menu_item_new_with_label(mountpoint);
+	m->item = gtk_menu_item_new_with_label(mountpoint + strlen(MEDIA_DIR));
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
 
@@ -60,14 +61,6 @@ void add_mount(const char *udi, char *mountpoint)
 void remove_mount(const char *udi)
 {
 	g_hash_table_remove(dev, udi);
-#if 0
-	struct mdev *m;
-
-	show_table();
-	if ((m = g_hash_table_lookup(dev, udi))) {
-		printf("mp = %s\n", m->mountpoint);
-	}
-#endif
 }
 
 
@@ -95,7 +88,7 @@ static void hal_property_modified(LibHalContext *ctx, const char *udi,
 			char *mountpoint = libhal_device_get_property_string(
 					ctx, udi, "volume.mount_point", NULL);
 			
-			if (!strncmp("/media", mountpoint, strlen("/media"))) {
+			if (!strncmp(MEDIA_DIR, mountpoint, strlen(MEDIA_DIR))) {
 				add_mount(udi, mountpoint);
 			}
 
