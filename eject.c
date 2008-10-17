@@ -13,10 +13,69 @@
 #define CMD_SIZE 256
 
 GHashTable *dev;
+GtkWidget *menu, *item;
 struct GtkStatusIcon *icon;
 
 struct mdev {
+	GtkWidget *item;
+	char *mountpoint;
 };
+
+
+void key_destroy(gpointer data)
+{
+	free(data);
+}
+
+void value_destroy(gpointer data)
+{
+	struct mdev *m = (struct mdev *)data;
+
+	gtk_widget_destroy(m->item);
+	free(m);
+}
+
+
+void add_mount(const char *udi, char *mountpoint)
+{
+	struct mdev *m;
+	printf("udi = %s, mountpoint = %s\n", udi, mountpoint);
+
+	if ((m = malloc(sizeof(*m))) == NULL) {
+		perror("malloc");
+		return;
+	}
+
+	if ((m->mountpoint = strdup(mountpoint)) == NULL) {
+		return;
+	}
+
+	m->item = gtk_menu_item_new_with_label(mountpoint);
+        gtk_widget_show(m->item);
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
+
+	g_hash_table_insert(dev, strdup(udi), m);
+}
+
+void remove_mount(const char *udi)
+{
+	g_hash_table_remove(dev, udi);
+#if 0
+	struct mdev *m;
+
+	show_table();
+	if ((m = g_hash_table_lookup(dev, udi))) {
+		printf("mp = %s\n", m->mountpoint);
+	}
+#endif
+}
+
+
+static void popup()
+{
+	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
+					gtk_get_current_event_time());
+}
 
 int eject(char *device, char *mountpoint)
 {
@@ -24,21 +83,6 @@ int eject(char *device, char *mountpoint)
 
 	snprintf(line, CMD_SIZE, "eject %s", device);
 	return system(line);
-}
-
-static dbus_bool_t hal_mainloop_integration(LibHalContext *ctx,
-					    DBusError *error)
-{
-	DBusConnection *dbus_connection;
-	dbus_connection = dbus_bus_get(DBUS_BUS_SYSTEM, error);
-
-	if (dbus_error_is_set(error))
-		return FALSE;
-
-	dbus_connection_setup_with_g_main(dbus_connection, NULL);
-	libhal_ctx_set_dbus_connection(ctx, dbus_connection);
-
-	return TRUE;
 }
 
 static void hal_property_modified(LibHalContext *ctx, const char *udi,
@@ -51,16 +95,19 @@ static void hal_property_modified(LibHalContext *ctx, const char *udi,
 			char *mountpoint = libhal_device_get_property_string(
 					ctx, udi, "volume.mount_point", NULL);
 			
-			printf(":%s: %s\n", mountpoint, udi);
+			if (!strncmp("/media", mountpoint, strlen("/media"))) {
+				add_mount(udi, mountpoint);
+			}
+
 			if (mountpoint)
 				libhal_free_string(mountpoint);
 		} else {
-			printf("remove %s\n", udi);
+			remove_mount(udi);
 		}
 	}
 }
 
-gboolean do_hal_init(void)
+gboolean hal_init(void)
 {
 	LibHalContext *ctx;
 	DBusError error;
@@ -145,6 +192,7 @@ gboolean do_hal_init(void)
 	}
 
 	libhal_free_string_array(volumes);
+
 	return TRUE;
 }
 
@@ -152,12 +200,20 @@ int main(int argc, char **argv)
 {
 	gtk_init(&argc, &argv);
 
-	dev = g_hash_table_new(g_str_hash, g_str_equal);
+	dev = g_hash_table_new_full(g_str_hash, g_str_equal, key_destroy, value_destroy);
+
 
 	icon = (struct GtkStatusIcon *)
                         gtk_status_icon_new_from_file(ICON_PATH "exit.png");
+	item = gtk_menu_item_new_with_label("Bla");
+	menu = gtk_menu_new();
+	gtk_widget_show(item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	g_signal_connect(G_OBJECT(icon), "popup-menu",
+						G_CALLBACK(popup), NULL);
 
-	do_hal_init();
+
+	hal_init();
 	gtk_main();
 
 	return 0;
