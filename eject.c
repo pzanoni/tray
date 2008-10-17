@@ -3,15 +3,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
+#include <gtk/gtk.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #include <libhal.h>
 
+#define ICON_PATH ICON_DIR "/tray_reboot/"
 #define CMD_SIZE 256
 
-//GHashtable *dev;
+GHashTable *dev;
+struct GtkStatusIcon *icon;
 
+struct mdev {
+};
 
 int eject(char *device, char *mountpoint)
 {
@@ -21,8 +26,8 @@ int eject(char *device, char *mountpoint)
 	return system(line);
 }
 
-static dbus_bool_t hal_mainloop_integration(LibHalContext * ctx,
-					    DBusError * error)
+static dbus_bool_t hal_mainloop_integration(LibHalContext *ctx,
+					    DBusError *error)
 {
 	DBusConnection *dbus_connection;
 	dbus_connection = dbus_bus_get(DBUS_BUS_SYSTEM, error);
@@ -36,21 +41,22 @@ static dbus_bool_t hal_mainloop_integration(LibHalContext * ctx,
 	return TRUE;
 }
 
-static void hal_device_removed(LibHalContext * ctx, const char *udi)
-{
-	printf("remove_volume: %s\n", udi);
-}
-
-static void hal_property_modified(LibHalContext * ctx, const char *udi,
+static void hal_property_modified(LibHalContext *ctx, const char *udi,
 				  const char *key, dbus_bool_t is_removed,
 				  dbus_bool_t is_added)
 {
+
 	if (!strcmp(key, "volume.is_mounted")) {
-		char *mountpoint = libhal_device_get_property_string(ctx, udi,
-					  "volume.mount_point", NULL);
-		printf(":%s: %s\n", mountpoint, udi);
-		if (mountpoint)
-			libhal_free_string(mountpoint);
+		if (libhal_device_get_property_bool(ctx, udi, "volume.is_mounted", NULL)) {
+			char *mountpoint = libhal_device_get_property_string(
+					ctx, udi, "volume.mount_point", NULL);
+			
+			printf(":%s: %s\n", mountpoint, udi);
+			if (mountpoint)
+				libhal_free_string(mountpoint);
+		} else {
+			printf("remove %s\n", udi);
+		}
 	}
 }
 
@@ -58,6 +64,7 @@ gboolean do_hal_init(void)
 {
 	LibHalContext *ctx;
 	DBusError error;
+	DBusConnection *dbus_connection;
 	char **devices;
 	char **volumes;
 	char *udi;
@@ -70,14 +77,18 @@ gboolean do_hal_init(void)
 	}
 
 	dbus_error_init(&error);
-	if (!hal_mainloop_integration(ctx, &error)) {
+
+	dbus_connection = dbus_bus_get(DBUS_BUS_SYSTEM, &error);
+
+	if (dbus_error_is_set(&error)) {
 		printf("hal_initialize failed: %s\n", error.message);
 		dbus_error_free(&error);
 		return FALSE;
 	}
 
-	//libhal_ctx_set_device_added(ctx, hal_device_added);
-	libhal_ctx_set_device_removed(ctx, hal_device_removed);
+	dbus_connection_setup_with_g_main(dbus_connection, NULL);
+	libhal_ctx_set_dbus_connection(ctx, dbus_connection);
+
 	libhal_ctx_set_device_property_modified(ctx, hal_property_modified);
 
 	if (!libhal_device_property_watch_all(ctx, &error)) {
@@ -137,15 +148,17 @@ gboolean do_hal_init(void)
 	return TRUE;
 }
 
-int main()
+int main(int argc, char **argv)
 {
-	static GMainLoop *loop;
+	gtk_init(&argc, &argv);
 
-	//dev = g_hash_table_new(g_str_hash, g_str_equal);
+	dev = g_hash_table_new(g_str_hash, g_str_equal);
+
+	icon = (struct GtkStatusIcon *)
+                        gtk_status_icon_new_from_file(ICON_PATH "exit.png");
 
 	do_hal_init();
-	loop = g_main_loop_new(NULL, FALSE);
-	g_main_loop_run(loop);
+	gtk_main();
 
 	return 0;
 }
