@@ -12,7 +12,7 @@ LDFLAGS	=
 LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
-BINS	= tray_reboot tray_keyleds tray_mixer
+BINS	= tray_reboot tray_keyleds tray_mixer tray_eject
 INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
 LANGS	= pt_BR
@@ -34,6 +34,9 @@ locale:
 		done \
 	done
 
+eject.o: eject.c
+	$(CC) -c $(CFLAGS) `pkg-config --cflags hal` -o $*.o $<
+
 tray_reboot: reboot.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
 
@@ -42,6 +45,9 @@ tray_keyleds: keyleds.o
 
 tray_mixer: mixer.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS) -lasound
+
+tray_eject: eject.o
+	$(LD) $(LDFLAGS) -o $@ $+ `pkg-config --libs hal` `pkg-config --libs dbus-glib-1` $(LIBS)
 
 tray_reboot-install: tray_reboot
 	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_reboot
