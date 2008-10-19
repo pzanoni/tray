@@ -13,6 +13,8 @@
 #define MEDIA_DIR "/media/"
 #define CMD_SIZE 256
 
+/* Originally based on wmvolman by Sir Raorn */
+
 
 GHashTable *dev;
 GtkWidget *menu, *item, *sep;
@@ -96,8 +98,7 @@ int eject(char *device, char *mountpoint)
 }
 
 static void hal_property_modified(LibHalContext *ctx, const char *udi,
-				  const char *key, dbus_bool_t is_removed,
-				  dbus_bool_t is_added)
+	  const char *key, dbus_bool_t is_removed, dbus_bool_t is_added)
 {
 
 	if (!strcmp(key, "volume.is_mounted")) {
@@ -119,83 +120,72 @@ static void hal_property_modified(LibHalContext *ctx, const char *udi,
 	}
 }
 
-gboolean hal_init(void)
+int init_hal(void)
 {
 	LibHalContext *ctx;
 	DBusError error;
 	DBusConnection *dbus_connection;
-	char **devices;
-	char **volumes;
-	char *udi;
-	int i;
-	int nr;
+	char **devices, **volumes;
+	int i, num;
 
 	if (!(ctx = libhal_ctx_new())) {
-		printf("failed to initialize HAL!\n");
-		return FALSE;
+		fprintf(stderr, "can't initialize\n");
+		return -1;
 	}
 
 	dbus_error_init(&error);
-
 	dbus_connection = dbus_bus_get(DBUS_BUS_SYSTEM, &error);
 
 	if (dbus_error_is_set(&error)) {
-		printf("hal_initialize failed: %s\n", error.message);
+		fprintf(stderr, "%s\n", error.message);
 		dbus_error_free(&error);
-		return FALSE;
+		return -1;
 	}
 
 	dbus_connection_setup_with_g_main(dbus_connection, NULL);
 	libhal_ctx_set_dbus_connection(ctx, dbus_connection);
-
 	libhal_ctx_set_device_property_modified(ctx, hal_property_modified);
 
 	if (!libhal_device_property_watch_all(ctx, &error)) {
-		printf("failed to watch all HAL properties!: %s\n",
-		     error.message);
+		fprintf(stderr, "%s\n", error.message);
 		dbus_error_free(&error);
 		libhal_ctx_free(ctx);
-		return FALSE;
+		return -1;
 	}
 
 	if (!libhal_ctx_init(ctx, &error)) {
-		printf("hal_initialize failed: %s\n", error.message);
+		fprintf(stderr, "%s\n", error.message);
 		dbus_error_free(&error);
 		libhal_ctx_free(ctx);
-		return FALSE;
+		return -1;
 	}
 
-	/*
-	 * Do something to ping the HAL daemon - the above functions will
-	 * succeed even if hald is not running, so long as DBUS is.  But we
-	 * want to exit silently if hald is not running, to behave on
-	 * pre-2.6 systems.
-	 */
-	devices = libhal_get_all_devices(ctx, &nr, &error);
-	if (!devices) {
-		printf("seems that HAL is not running: %s\n", error.message);
+	if (!(devices = libhal_get_all_devices(ctx, &num, &error))) {
+		fprintf(stderr, "%s\n", error.message);
 		dbus_error_free(&error);
-
 		libhal_ctx_shutdown(ctx, NULL);
 		libhal_ctx_free(ctx);
-		return FALSE;
+		return -1;
 	}
+
 	libhal_free_string_array(devices);
 
-	volumes = libhal_find_device_by_capability(ctx, "volume", &nr, &error);
+	volumes = libhal_find_device_by_capability(ctx, "volume", &num, &error);
 	if (dbus_error_is_set(&error)) {
-		printf("could not find volume devices: %s\n", error.message);
+		printf("can't find volume devices: %s\n", error.message);
 		dbus_error_free(&error);
-
 		libhal_ctx_shutdown(ctx, NULL);
 		libhal_ctx_free(ctx);
-		return FALSE;
+		return -1;
 	}
 
-	for (i = 0; i < nr; i++) {
-		udi = volumes[i];
+	for (i = 0; i < num; i++) {
+		char *udi = volumes[i];
 
-		if (libhal_device_property_exists(ctx, udi, "volume.is_mounted", NULL) && libhal_device_get_property_bool(ctx, udi, "volume.is_mounted", NULL)) {
+		if (libhal_device_property_exists(ctx, udi, "volume.is_mounted",
+			 NULL) && libhal_device_get_property_bool(ctx, udi,
+			"volume.is_mounted", NULL))
+		{
 			hal_property_modified(ctx, udi, "volume.is_mounted",
 					      FALSE, FALSE);
 			hal_property_modified(ctx, udi, "volume.mount_point",
@@ -205,7 +195,7 @@ gboolean hal_init(void)
 
 	libhal_free_string_array(volumes);
 
-	return TRUE;
+	return 0;
 }
 
 int main(int argc, char **argv)
@@ -213,8 +203,8 @@ int main(int argc, char **argv)
 	gtk_init(&argc, &argv);
 
 	count = 0;
-	dev = g_hash_table_new_full(g_str_hash, g_str_equal, key_destroy, value_destroy);
-
+	dev = g_hash_table_new_full(g_str_hash, g_str_equal, key_destroy,
+							value_destroy);
 
 	icon = (GtkStatusIcon *)
                         gtk_status_icon_new_from_file(ICON_PATH "dev0.png");
@@ -228,8 +218,9 @@ int main(int argc, char **argv)
 	g_signal_connect(G_OBJECT(icon), "popup-menu",
 						G_CALLBACK(popup), NULL);
 
+	if (init_hal() < 0)
+		return 1;
 
-	hal_init();
 	gtk_main();
 
 	return 0;
