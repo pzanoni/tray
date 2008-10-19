@@ -16,13 +16,27 @@
 
 GHashTable *dev;
 GtkWidget *menu, *item, *sep;
-struct GtkStatusIcon *icon;
+GtkStatusIcon *icon;
+int count;
 
 struct mdev {
 	GtkWidget *item;
 	char *mountpoint;
 };
 
+
+void update_status()
+{
+	if (count) {
+		gtk_widget_show(sep);
+		gtk_widget_set_sensitive(item, TRUE);
+		gtk_status_icon_set_from_file(icon, ICON_PATH "dev1.png");
+	} else {
+		gtk_widget_hide(sep);
+		gtk_widget_set_sensitive(item, FALSE);
+		gtk_status_icon_set_from_file(icon, ICON_PATH "dev0.png");
+	}
+}
 
 void key_destroy(gpointer data)
 {
@@ -35,6 +49,7 @@ void value_destroy(gpointer data)
 
 	gtk_widget_destroy(m->item);
 	free(m);
+	count--;
 }
 
 
@@ -55,6 +70,7 @@ void add_mount(const char *udi, char *mountpoint)
 	m->item = gtk_menu_item_new_with_label(txt);
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
+	count++;
 
 	g_hash_table_insert(dev, strdup(udi), m);
 }
@@ -98,6 +114,8 @@ static void hal_property_modified(LibHalContext *ctx, const char *udi,
 		} else {
 			remove_mount(udi);
 		}
+
+		update_status();
 	}
 }
 
@@ -194,10 +212,11 @@ int main(int argc, char **argv)
 {
 	gtk_init(&argc, &argv);
 
+	count = 0;
 	dev = g_hash_table_new_full(g_str_hash, g_str_equal, key_destroy, value_destroy);
 
 
-	icon = (struct GtkStatusIcon *)
+	icon = (GtkStatusIcon *)
                         gtk_status_icon_new_from_file(ICON_PATH "dev0.png");
 	item = gtk_menu_item_new_with_label("Remove all");
 	sep = gtk_separator_menu_item_new();
