@@ -54,11 +54,24 @@ void value_destroy(gpointer data)
 }
 
 
+static void eject_device(gpointer key, gpointer value, gpointer user_data)
+{
+	struct mdev *m = value;
+	char cmd[256];
+
+	if (value) {
+		snprintf(cmd, 256, "eject %s", m->mountpoint);
+		system(cmd);
+	}
+}
+
 static void eject(GtkWidget *widget, gpointer data)
 {
-	char *udi = data;
-
-	printf("eject: %s\n", udi);
+	if (data) {
+		eject_device(NULL, data, NULL);
+	} else {
+		g_hash_table_foreach(dev, eject_device, NULL);
+	}
 }
 
 static void add_mount(const char *udi, char *mountpoint)
@@ -86,7 +99,7 @@ static void add_mount(const char *udi, char *mountpoint)
 	m->item = gtk_menu_item_new_with_label(txt);
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
-	g_signal_connect(G_OBJECT(m->item), "activate", G_CALLBACK(eject), u);
+	g_signal_connect(G_OBJECT(m->item), "activate", G_CALLBACK(eject), m);
 	count++;
 
 	g_hash_table_insert(dev, u, m);
