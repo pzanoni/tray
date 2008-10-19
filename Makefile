@@ -25,7 +25,7 @@ LANGS	= pt_BR
 
 all: $(BINS)
 
-install: $(INSTS)
+install: locale $(INSTS)
 
 locale:
 	@for i in $(LOCS); do \
@@ -49,33 +49,19 @@ tray_mixer: mixer.o
 tray_eject: eject.o
 	$(LD) $(LDFLAGS) -o $@ $+ `pkg-config --libs hal` `pkg-config --libs dbus-glib-1` $(LIBS)
 
-tray_reboot-install: tray_reboot
-	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_reboot
-	$(INSTALL) -m644 icons/tray_reboot/*.png $(DESTDIR)$(ICONDIR)/tray_reboot
-	$(INSTALL) -m755 -s tray_reboot $(DESTDIR)$(BINDIR)
+
+%-install: %
+	@$(MAKE) applet-install APPLET="$+"
+
+applet-install:
+	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/$(APPLET)
+	$(INSTALL) -m644 icons/$(APPLET)/*.png $(DESTDIR)$(ICONDIR)/$(APPLET)
+	$(INSTALL) -m755 -s $(APPLET) $(DESTDIR)$(BINDIR)
 	for i in $(LANGS); do \
-		$(INSTALL) -m644 -D intl/tray_reboot/$$i.mo \
-			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/tray_reboot.mo; \
+		$(INSTALL) -m644 -D intl/$(APPLET)/$$i.mo \
+			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/$(APPLET).mo; \
 	done
 
-tray_keyleds-install: tray_keyleds
-	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_keyleds
-	$(INSTALL) -m644 icons/tray_keyleds/*.png $(DESTDIR)$(ICONDIR)/tray_keyleds
-	$(INSTALL) -m755 -s tray_keyleds $(DESTDIR)$(BINDIR)
-	for i in $(LANGS); do \
-		$(INSTALL) -m644 -D intl/tray_keyleds/$$i.mo \
-			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/tray_keyleds.mo; \
-	done
-	
-tray_mixer-install: tray_mixer
-	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/tray_mixer
-	$(INSTALL) -m644 icons/tray_mixer/*.png $(DESTDIR)$(ICONDIR)/tray_mixer
-	$(INSTALL) -m755 -s tray_mixer $(DESTDIR)$(BINDIR)
-	for i in $(LANGS); do \
-		$(INSTALL) -m644 -D intl/tray_mixer/$$i.mo \
-			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/tray_mixer.mo; \
-	done
-	
 clean:
 	rm -f core *.o *~ intl/*/*.mo
 
