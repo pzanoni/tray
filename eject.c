@@ -9,13 +9,13 @@
 #include <dbus/dbus-glib-lowlevel.h>
 #include <libhal.h>
 
-#define ICON_PATH ICON_DIR "/tray_reboot/"
+#define ICON_PATH ICON_DIR "/tray_eject/"
 #define MEDIA_DIR "/media/"
 #define CMD_SIZE 256
 
 
 GHashTable *dev;
-GtkWidget *menu, *item;
+GtkWidget *menu, *item, *sep;
 struct GtkStatusIcon *icon;
 
 struct mdev {
@@ -41,17 +41,18 @@ void value_destroy(gpointer data)
 void add_mount(const char *udi, char *mountpoint)
 {
 	struct mdev *m;
+	char txt[80];
 
 	if ((m = malloc(sizeof(*m))) == NULL) {
 		perror("malloc");
 		return;
 	}
 
-	if ((m->mountpoint = strdup(mountpoint)) == NULL) {
+	if ((m->mountpoint = strdup(mountpoint)) == NULL)
 		return;
-	}
 
-	m->item = gtk_menu_item_new_with_label(mountpoint + strlen(MEDIA_DIR));
+	snprintf(txt, 80, "%s %s", "Remove", mountpoint + strlen(MEDIA_DIR));
+	m->item = gtk_menu_item_new_with_label(txt);
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
 
@@ -197,11 +198,14 @@ int main(int argc, char **argv)
 
 
 	icon = (struct GtkStatusIcon *)
-                        gtk_status_icon_new_from_file(ICON_PATH "exit.png");
-	item = gtk_menu_item_new_with_label("Bla");
+                        gtk_status_icon_new_from_file(ICON_PATH "dev0.png");
+	item = gtk_menu_item_new_with_label("Remove all");
+	sep = gtk_separator_menu_item_new();
 	menu = gtk_menu_new();
 	gtk_widget_show(item);
+	gtk_widget_show(sep);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
 	g_signal_connect(G_OBJECT(icon), "popup-menu",
 						G_CALLBACK(popup), NULL);
 
