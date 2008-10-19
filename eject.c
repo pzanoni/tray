@@ -11,7 +11,6 @@
 
 #define ICON_PATH ICON_DIR "/tray_eject/"
 #define MEDIA_DIR "/media/"
-#define CMD_SIZE 256
 
 /* Originally based on wmvolman by Sir Raorn */
 
@@ -47,7 +46,7 @@ void key_destroy(gpointer data)
 
 void value_destroy(gpointer data)
 {
-	struct mdev *m = (struct mdev *)data;
+	struct mdev *m = data;
 
 	gtk_widget_destroy(m->item);
 	free(m);
@@ -55,29 +54,45 @@ void value_destroy(gpointer data)
 }
 
 
-void add_mount(const char *udi, char *mountpoint)
+static void eject(GtkWidget *widget, gpointer data)
+{
+	char *udi = data;
+
+	printf("eject: %s\n", udi);
+}
+
+static void add_mount(const char *udi, char *mountpoint)
 {
 	struct mdev *m;
-	char txt[80];
+	char *u, txt[80];
 
 	if ((m = malloc(sizeof(*m))) == NULL) {
 		perror("malloc");
 		return;
 	}
 
-	if ((m->mountpoint = strdup(mountpoint)) == NULL)
+	if ((m->mountpoint = strdup(mountpoint)) == NULL) {
+		free(m);
 		return;
+	}
+
+	if ((u = strdup(udi)) == NULL) {
+		free(m);
+		free(m->mountpoint);
+		return;
+	}
 
 	snprintf(txt, 80, "%s %s", "Remove", mountpoint + strlen(MEDIA_DIR));
 	m->item = gtk_menu_item_new_with_label(txt);
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
+	g_signal_connect(G_OBJECT(m->item), "activate", G_CALLBACK(eject), u);
 	count++;
 
-	g_hash_table_insert(dev, strdup(udi), m);
+	g_hash_table_insert(dev, u, m);
 }
 
-void remove_mount(const char *udi)
+static void remove_mount(const char *udi)
 {
 	g_hash_table_remove(dev, udi);
 }
@@ -87,14 +102,6 @@ static void popup()
 {
 	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
 					gtk_get_current_event_time());
-}
-
-int eject(char *device, char *mountpoint)
-{
-	char line[CMD_SIZE];
-
-	snprintf(line, CMD_SIZE, "eject %s", device);
-	return system(line);
 }
 
 static void hal_property_modified(LibHalContext *ctx, const char *udi,
@@ -120,7 +127,7 @@ static void hal_property_modified(LibHalContext *ctx, const char *udi,
 	}
 }
 
-int init_hal(void)
+static int init_hal(void)
 {
 	LibHalContext *ctx;
 	DBusError error;
@@ -208,13 +215,18 @@ int main(int argc, char **argv)
 
 	icon = (GtkStatusIcon *)
                         gtk_status_icon_new_from_file(ICON_PATH "dev0.png");
-	item = gtk_menu_item_new_with_label("Remove all");
-	sep = gtk_separator_menu_item_new();
+
 	menu = gtk_menu_new();
+
+	item = gtk_menu_item_new_with_label("Remove all");
 	gtk_widget_show(item);
-	gtk_widget_show(sep);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(eject), NULL);
+
+	sep = gtk_separator_menu_item_new();
+	gtk_widget_show(sep);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
+
 	g_signal_connect(G_OBJECT(icon), "popup-menu",
 						G_CALLBACK(popup), NULL);
 
