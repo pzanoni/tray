@@ -109,7 +109,8 @@ static void add_mount(const char *udi, char *mountpoint)
 		return;
 	}
 
-	snprintf(txt, 80, "%s %s", "Remove", mountpoint + strlen(MEDIA_DIR));
+	snprintf(txt, 80, "%s %s", "Safely remove",
+					mountpoint + strlen(MEDIA_DIR));
 	m->item = gtk_menu_item_new_with_label(txt);
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
@@ -245,7 +246,7 @@ int main(int argc, char **argv)
 
 	menu = gtk_menu_new();
 
-	item = gtk_menu_item_new_with_label("Remove all");
+	item = gtk_menu_item_new_with_label("Safely remove all");
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(eject), NULL);
