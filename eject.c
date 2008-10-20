@@ -265,9 +265,9 @@ int main(int argc, char **argv)
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, NULL);
 
-	msg = gtk_label_new("Unable to unmount this device.\nSome "
+	msg = gtk_label_new("Unable to unmount this device.Some\n"
 			"application is likely to be using it.\n"
-			"Please close the offending application "
+			"Please close the offending application\n"
 			"and try again.");
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), msg, TRUE, TRUE, 10);
         gtk_widget_show(msg);
