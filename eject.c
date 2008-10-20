@@ -17,6 +17,7 @@
 
 GHashTable *dev;
 GtkWidget *menu, *item, *sep;
+GtkWidget *dialog, *msg;
 GtkStatusIcon *icon;
 int count;
 
@@ -57,6 +58,7 @@ void value_destroy(gpointer data)
 	count--;
 }
 
+static int res = 0;
 
 static void eject_device(gpointer key, gpointer value, gpointer user_data)
 {
@@ -64,17 +66,25 @@ static void eject_device(gpointer key, gpointer value, gpointer user_data)
 	char cmd[256];
 
 	if (value) {
-		snprintf(cmd, 256, "eject %s", m->mountpoint);
-		system(cmd);
+		snprintf(cmd, 256, "umount %s", m->mountpoint);
+		res |= system(cmd);
 	}
 }
 
 static void eject(GtkWidget *widget, gpointer data)
 {
+	res = 0;
+
 	if (data) {
 		eject_device(NULL, data, NULL);
 	} else {
 		g_hash_table_foreach(dev, eject_device, NULL);
+	}
+
+	if (res) {
+        	gtk_widget_show(dialog);
+		gtk_dialog_run(GTK_DIALOG(dialog));
+        	gtk_widget_hide(dialog);
 	}
 }
 
@@ -249,6 +259,17 @@ int main(int argc, char **argv)
 
 	if (init_hal() < 0)
 		return 1;
+
+	dialog = gtk_dialog_new_with_buttons(NULL, NULL,
+			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_STOCK_OK, NULL);
+
+	msg = gtk_label_new("Unable to unmount this device.\nSome "
+			"application is likely to be using it.\n"
+			"Please close the offending application "
+			"and try again.");
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), msg, TRUE, TRUE, 10);
+        gtk_widget_show(msg);
 
 	gtk_main();
 
