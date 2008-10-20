@@ -9,6 +9,8 @@
 #include <dbus/dbus-glib-lowlevel.h>
 #include <libhal.h>
 
+#include "tray.h"
+
 #define ICON_PATH ICON_DIR "/tray_eject/"
 #define MEDIA_DIR "/media/"
 
