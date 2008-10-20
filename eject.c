@@ -28,6 +28,7 @@ struct mdev {
 
 void update_status()
 {
+#if 0
 	if (count) {
 		gtk_widget_show(sep);
 		gtk_widget_set_sensitive(item, TRUE);
@@ -37,6 +38,9 @@ void update_status()
 		gtk_widget_set_sensitive(item, FALSE);
 		gtk_status_icon_set_from_file(icon, ICON_PATH "dev0.png");
 	}
+#endif
+
+	gtk_status_icon_set_visible(icon, !!count);
 }
 
 void key_destroy(gpointer data)
@@ -227,7 +231,7 @@ int main(int argc, char **argv)
 							value_destroy);
 
 	icon = (GtkStatusIcon *)
-                        gtk_status_icon_new_from_file(ICON_PATH "dev0.png");
+                        gtk_status_icon_new_from_file(ICON_PATH "dev1.png");
 
 	menu = gtk_menu_new();
 
