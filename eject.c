@@ -13,6 +13,7 @@
 
 #define ICON_PATH ICON_DIR "/tray_eject/"
 #define MEDIA_DIR "/media/"
+#define FILE_BROWSER "nautilus"
 
 /* Originally based on wmvolman by Sir Raorn */
 
@@ -25,6 +26,7 @@ int count;
 
 struct mdev {
 	GtkWidget *item;
+	GtkWidget *item_content;
 	char *mountpoint;
 };
 
@@ -56,6 +58,7 @@ void value_destroy(gpointer data)
 	struct mdev *m = data;
 
 	gtk_widget_destroy(m->item);
+	gtk_widget_destroy(m->item_content);
 	free(m);
 	count--;
 }
@@ -90,6 +93,29 @@ static void eject(GtkWidget *widget, gpointer data)
 	}
 }
 
+static void access_device(gpointer key, gpointer value, gpointer user_data)
+{
+	int pid=1;
+	struct mdev *m = value;
+	char cmd[256];
+	
+	if (value) {
+	       pid = fork();
+	       if (!pid) {
+	           snprintf(cmd, 256, FILE_BROWSER " %s", m->mountpoint);
+		   res |= system(cmd);
+		   exit(1);
+	       }
+	}
+}
+
+static void access_(GtkWidget *widget, gpointer data)
+{
+       if (data) {
+               access_device(NULL, data, NULL);
+       }
+}
+
 static void add_mount(const char *udi, char *mountpoint)
 {
 	struct mdev *m;
@@ -117,6 +143,14 @@ static void add_mount(const char *udi, char *mountpoint)
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
 	g_signal_connect(G_OBJECT(m->item), "activate", G_CALLBACK(eject), m);
+
+        snprintf(txt, 80, "%s %s", N_("Access content on"),
+		                        mountpoint + strlen(MEDIA_DIR));
+        m->item_content = gtk_menu_item_new_with_label(txt);
+        gtk_widget_show(m->item_content);
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item_content);
+        g_signal_connect(G_OBJECT(m->item_content), "activate", G_CALLBACK(access_), m);
+
 	count++;
 
 	g_hash_table_insert(dev, u, m);
