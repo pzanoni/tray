@@ -183,6 +183,11 @@ int main(int argc, char **argv)
 	gtk_container_add(GTK_CONTAINER(vbox), button5);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
+	gtk_window_set_title(GTK_WINDOW(window), N_("Quit session"));
+
+	GdkPixbuf *pixbuf;
+	pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/gnome/scalable/actions/gtk-quit.svg", NULL);
+	gtk_window_set_icon(GTK_WINDOW(window), pixbuf);
 
 	if (direct) {
 		click();
