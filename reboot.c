@@ -99,9 +99,9 @@ static void set_button(GtkWidget **b, char *l, int p, char *i)
 
 int main(int argc, char **argv)
 {
-	GtkSettingsValue sval;
-	struct GtkStatusIcon *icon1;
-	struct GtkStatusIcon *icon2;
+	struct GtkStatusIcon *icon1 = NULL;
+	struct GtkStatusIcon *icon2 = NULL;
+	GtkSettings *settings;
 	int o;
 
 	bindtextdomain("tray_reboot", LOCALE_DIR);
@@ -149,12 +149,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-	sval.value.g_type = G_TYPE_INVALID;
-	g_value_init(&sval.value, G_TYPE_LONG);
-	g_value_set_long(&sval.value, TRUE);
-	gtk_settings_set_property_value(gtk_settings_get_default(),
-						"gtk-button-images", &sval);
-
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 15);
 	vbox = gtk_vbox_new(TRUE, TRUE);
@@ -168,6 +162,9 @@ int main(int argc, char **argv)
 	set_button(&button3, N_("Suspend"), OPT_SUSPEND, ICON_PATH "suspend.png");
 	set_button(&button4, N_("Hibernate"), OPT_HIBERNATE, ICON_PATH "hibernate.png");
 	set_button(&button5, N_("Cancel"), OPT_CANCEL, ICON_PATH "cancel.png");
+
+	settings = gtk_settings_get_default();
+	g_object_set (settings, "gtk-button-images", TRUE, NULL);
 
 	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
