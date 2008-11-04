@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <dbus/dbus.h>
@@ -300,9 +301,10 @@ int main(int argc, char **argv)
 	if (init_hal() < 0)
 		return 1;
 
-	dialog = gtk_dialog_new_with_buttons(NULL, NULL,
+	dialog = gtk_dialog_new_with_buttons("Error", NULL,
 			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, NULL);
+	gtk_window_set_icon_from_file(GTK_WINDOW(dialog), "error.png", NULL);
 
 	msg = gtk_label_new(N_("Unable to unmount this device. Some\napplication is likely to be using it.\nPlease close the offending application\nand try again."));
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), msg, TRUE, TRUE, 10);
