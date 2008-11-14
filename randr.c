@@ -10,17 +10,17 @@
 
 #define ICON_PATH ICON_DIR "/tray_randr/"
 
-#define CMD_INT_ON  "xrandr --output lvds --pos 0x0"
-#define CMD_INT_OFF "xrandr --output lvds --off"
-#define CMD_EXT_ON  "xrandr --output vga --pos 0x0"
-#define CMD_EXT_OFF "xrandr --output vga --off"
+#define CMD_INT_ON  "xrandr --output LVDS --pos 0x0 --auto"
+#define CMD_INT_OFF "xrandr --output LVDS --off"
+#define CMD_EXT_ON  "xrandr --output VGA --pos 0x0 --auto"
+#define CMD_EXT_OFF "xrandr --output VGA --off"
 
 #define CMD_SWEXT CMD_INT_OFF ";" CMD_EXT_ON
 #define CMD_SWINT CMD_EXT_OFF ";" CMD_INT_ON
 #define CMD_CLONE CMD_INT_ON ";" CMD_EXT_ON
-#define CMD_1024 "xrandr --output vga --size 1024x768"
-#define CMD_800  "xrandr --output vga --size 800x600"
-#define CMD_640  "xrandr --output vga --size 640x480"
+#define CMD_1024 "xrandr --output VGA --mode 1024x768"
+#define CMD_800  "xrandr --output VGA --mode 800x600"
+#define CMD_640  "xrandr --output VGA --mode 640x480"
 
 
 GtkWidget *menu, *sep;
