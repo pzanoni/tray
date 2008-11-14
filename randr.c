@@ -23,7 +23,7 @@
 #define CMD_640  "xrandr --output VGA --mode 640x480"
 
 
-GtkWidget *menu, *sep;
+GtkWidget *menu, *sep, *item_quit;
 GtkWidget *item_swext, *item_swint, *item_clone;
 GtkWidget *item_ext1024, *item_ext800, *item_ext640;
 GtkStatusIcon *icon;
@@ -35,13 +35,18 @@ struct mdev {
 	char *mountpoint;
 };
 
+static void quit()
+{
+	gtk_main_quit();
+}
+
 static void randr(GtkWidget *widget, gpointer data)
 {
 	char *cmd = (char *)data;
 	system(cmd);
 }
 
-void newitem(GtkWidget **item, char *txt, char *cmd)
+static void newitem(GtkWidget **item, char *txt, char *cmd)
 {
 	*item = gtk_menu_item_new_with_label(txt);
 	gtk_widget_show(*item);
@@ -82,6 +87,15 @@ int main(int argc, char **argv)
 	g_signal_connect(G_OBJECT(icon), "popup-menu",
 						G_CALLBACK(popup), NULL);
 
+	sep = gtk_separator_menu_item_new();
+	gtk_widget_show(sep);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
+
+	item_quit = gtk_menu_item_new_with_label(N_("Quit"));
+	gtk_widget_show(item_quit);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item_quit);
+	g_signal_connect(G_OBJECT(item_quit), "activate", G_CALLBACK(quit), NULL);
+	
 	gtk_main();
 
 	return 0;
