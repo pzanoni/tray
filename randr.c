@@ -10,6 +10,18 @@
 
 #define ICON_PATH ICON_DIR "/tray_randr/"
 
+#define CMD_INT_ON  "xrandr --output lvds --pos 0x0"
+#define CMD_INT_OFF "xrandr --output lvds --off"
+#define CMD_EXT_ON  "xrandr --output vga --pos 0x0"
+#define CMD_EXT_OFF "xrandr --output vga --off"
+
+#define CMD_SWEXT CMD_INT_OFF ";" CMD_EXT_ON
+#define CMD_SWINT CMD_EXT_OFF ";" CMD_INT_ON
+#define CMD_CLONE CMD_INT_ON ";" CMD_EXT_ON
+#define CMD_1024 "xrandr --output vga --size 1024x768"
+#define CMD_800  "xrandr --output vga --size 800x600"
+#define CMD_640  "xrandr --output vga --size 640x480"
+
 
 GtkWidget *menu, *sep;
 GtkWidget *item_swext, *item_swint, *item_clone;
@@ -25,14 +37,16 @@ struct mdev {
 
 static void randr(GtkWidget *widget, gpointer data)
 {
+	char *cmd = (char *)data;
+	system(cmd);
 }
 
-void newitem(GtkWidget **item, char *txt)
+void newitem(GtkWidget **item, char *txt, char *cmd)
 {
 	*item = gtk_menu_item_new_with_label(txt);
 	gtk_widget_show(*item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), *item);
-	g_signal_connect(G_OBJECT(*item), "activate", G_CALLBACK(randr), NULL);
+	g_signal_connect(G_OBJECT(*item), "activate", G_CALLBACK(randr), cmd);
 }
 
 static void popup()
@@ -53,17 +67,17 @@ int main(int argc, char **argv)
 
 	menu = gtk_menu_new();
 
-	newitem(&item_swext,   N_("Switch to external display"));
-	newitem(&item_swint,   N_("Switch to built-in display"));
-	newitem(&item_clone,   N_("Use both displays"));
+	newitem(&item_swext,   N_("Switch to external display"), CMD_SWEXT);
+	newitem(&item_swint,   N_("Switch to built-in display"), CMD_SWINT);
+	newitem(&item_clone,   N_("Use both displays"), CMD_CLONE);
 
 	sep = gtk_separator_menu_item_new();
 	gtk_widget_show(sep);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
 
-	newitem(&item_ext1024, N_("Set external resolution to 1024x768"));
-	newitem(&item_ext800,  N_("Set external resolution to 800x600"));
-	newitem(&item_ext640,  N_("Set external resolution to 640x480"));
+	newitem(&item_ext1024, N_("Set ext. resolution to 1024x768"), CMD_1024);
+	newitem(&item_ext800,  N_("Set ext. resolution to 800x600"), CMD_800);
+	newitem(&item_ext640,  N_("Set ext. resolution to 640x480"), CMD_640);
 
 	g_signal_connect(G_OBJECT(icon), "popup-menu",
 						G_CALLBACK(popup), NULL);
