@@ -12,7 +12,7 @@ LDFLAGS	=
 LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
-BINS	= tray_reboot tray_keyleds tray_mixer tray_eject
+BINS	= tray_reboot tray_keyleds tray_mixer tray_eject tray_randr
 INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
 LANGS	= pt_BR
@@ -48,6 +48,9 @@ tray_mixer: mixer.o
 
 tray_eject: eject.o
 	$(LD) $(LDFLAGS) -o $@ $+ `pkg-config --libs hal` `pkg-config --libs dbus-glib-1` $(LIBS)
+
+tray_randr: randr.o
+	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
 
 
 %-install: %
