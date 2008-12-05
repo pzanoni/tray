@@ -27,11 +27,12 @@ snd_mixer_t *mixer;
 snd_mixer_elem_t *elem;
 snd_mixer_selem_id_t *sid;
 
-	 
+static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud);
+static void update_gui(struct channel *c);
 
 static int mixer_init(char *name)
 {
-	int n;
+	int n, i;
 	struct pollfd *fds;
 
 	snd_mixer_selem_id_alloca(&sid);
@@ -56,6 +57,11 @@ static int mixer_init(char *name)
 	fds = calloc(n, sizeof(struct pollfd));
 	snd_mixer_poll_descriptors(mixer, fds, n);
 
+	for (i = 0; i < n; i++) {
+		GIOChannel* channel = g_io_channel_unix_new( fds[i].fd );
+		g_io_add_watch(channel, G_IO_IN|G_IO_HUP, on_mixer_event, NULL);
+		g_io_channel_unref(channel);
+	}
 	return 0;
 }
 
@@ -87,6 +93,36 @@ static void mixer_getmute(struct channel *c)
 	} else {
 		c->muteval = 1;
 	}
+}
+
+gboolean mixer_evt_idle;
+
+static gboolean reset_mixer_evt_idle()
+{
+    mixer_evt_idle = 0;
+    return FALSE;
+}
+
+static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
+{
+	if (mixer_evt_idle == 0) {
+		mixer_evt_idle = g_idle_add_full(G_PRIORITY_DEFAULT,
+						 (GSourceFunc) reset_mixer_evt_idle,
+						 NULL, NULL);
+		snd_mixer_handle_events (mixer);
+	}
+
+	if (cond & G_IO_IN) {
+		/* update mixer status */
+		update_gui (&ch[0]);
+	}
+
+	if (cond & G_IO_HUP) {
+		/* FIXME: This means there're some problems with alsa. */
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 static void update_icon(struct channel *c)
