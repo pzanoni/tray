@@ -103,7 +103,7 @@ static void access_device(gpointer key, gpointer value, gpointer user_data)
 	if (value) {
 	       pid = fork();
 	       if (!pid) {
-	           snprintf(cmd, 256, FILE_BROWSER " %s", m->mountpoint);
+		   snprintf(cmd, 256, FILE_BROWSER " --no-desktop %s", m->mountpoint);
 		   res |= system(cmd);
 		   exit(1);
 	       }
