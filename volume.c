@@ -317,7 +317,7 @@ int main(int argc, char **argv)
 
 	gtk_widget_show_all(window);
 	gdk_window_raise(window->window);
-	gdk_window_add_filter(NULL, key_filter, NULL);
+	gdk_window_add_filter(window->window, key_filter, NULL);
 
 	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 
