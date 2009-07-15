@@ -19,6 +19,8 @@ struct channel {
 	int muteval;
 };
 
+Display *display;
+Window rootwin;
 //GtkStatusIcon *icon;
 GtkWidget *window;
 GtkWidget *hbox;
@@ -203,6 +205,36 @@ static void quit()
 }
 #endif
 
+
+/* This function handles all of the keys which were grabbed via X */
+GdkFilterReturn key_filter(GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
+{
+	int type;
+	int key, keysym;
+	XKeyEvent *xevent;
+
+	xevent = gdk_xevent;
+	type = xevent->type;
+
+	if (type == KeyPress) {
+		key = ((XKeyEvent *) xevent)->keycode;
+		keysym = XKeycodeToKeysym(GDK_DISPLAY(), key, 0);
+
+		printf("caught keysym %i\n", keysym);
+
+#if 0
+		switch (keysym) {
+		case your_keysym:
+			// your key handler code
+			break;
+		}
+#endif
+	}
+
+	return GDK_FILTER_CONTINUE;
+}
+
+
 int main(int argc, char **argv)
 {
 	int o;
@@ -275,8 +307,18 @@ int main(int argc, char **argv)
 
 	//gtk_status_icon_set_visible(GTK_STATUS_ICON(icon), TRUE);
 
+	display = GDK_DISPLAY();
+	rootwin = GDK_ROOT_WINDOW();
+
+	XGrabKey(display, 97 /*122*/, AnyModifier, rootwin, False, GrabModeAsync,
+							GrabModeAsync);
+	XGrabKey(display, 115 /*123*/, AnyModifier, rootwin, False, GrabModeAsync,
+							GrabModeAsync);
+
 	gtk_widget_show_all(window);
 	gdk_window_raise(window->window);
+	gdk_window_add_filter(NULL, key_filter, NULL);
+
 	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 
 	gtk_main();
