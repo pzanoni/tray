@@ -9,6 +9,7 @@
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #include <libhal.h>
+#include <unistd.h>
 
 #include "tray.h"
 
@@ -69,10 +70,14 @@ static int res = 0;
 static void eject_device(gpointer key, gpointer value, gpointer user_data)
 {
 	struct mdev *m = value;
-	char cmd[256];
+	char cmd[256], mountcmd[8];
 
 	if (value) {
-		snprintf(cmd, 256, "umount %s", m->mountpoint);
+		if (!access("/usr/bin/pumount", X_OK))
+			snprintf(mountcmd, 8, "%s", "pumount");
+		else
+			snprintf(mountcmd, 8, "%s", "umount");
+		snprintf(cmd, 256, "%s %s", mountcmd, m->mountpoint);
 		res |= system(cmd);
 	}
 }
