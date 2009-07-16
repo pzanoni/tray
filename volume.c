@@ -176,27 +176,7 @@ static void update_gui(struct channel *c)
 }
 
 
-/*
-static void vol_change(GtkRange *range, struct channel *c)
-{
-	mixer_set(c, gtk_range_get_value(range));
-}
-*/
-
 #if 0
-static void mute(GtkWidget *widget, struct channel *c)
-{
-	int val, i;
-
-	val = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
-	for (i = 0; i <= SND_MIXER_SCHN_LAST; i++)
-		snd_mixer_selem_set_playback_switch(elem, i, !val);
-
-	mixer_getmute(c);
-	//update_icon(c);
-}
-
-
 static void click()
 {
 	static int show = 0;
@@ -209,17 +189,6 @@ static void click()
 	}
 
 	show ^= 1;
-}
-
-static void popup()
-{
-	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
-					gtk_get_current_event_time());
-}
-
-static void quit()
-{
-	gtk_main_quit();
 }
 #endif
 
@@ -305,24 +274,11 @@ int main(int argc, char **argv)
 
 	ch[0].hbox = gtk_hbox_new(FALSE, 5);
 	ch[0].image = gtk_image_new_from_file(ICON_PATH "speaker.png");
-	/*ch[0].pbar = gtk_pbar_new(GTK_ADJUSTMENT(
-		gtk_adjustment_new(mixer_get(&ch[0]), 0, 100, 0, 0, 0)));*/
 	ch[0].pbar = gtk_progress_bar_new();
-	//gtk_scale_set_draw_value(GTK_SCALE(ch[0].pbar), FALSE);
-	//gtk_range_set_inverted(GTK_RANGE(ch[0].pbar), TRUE);
 	gtk_container_add(GTK_CONTAINER(hbox), ch[0].hbox);
 	gtk_box_pack_start(GTK_BOX(ch[0].hbox), ch[0].image, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(ch[0].hbox), ch[0].pbar, TRUE, TRUE, 0);
 
-#if 0
-	if (snd_mixer_selem_has_playback_switch(elem)) {
-		ch[0].mute = gtk_check_button_new_with_label("Mute");
-		g_signal_connect((gpointer)ch[0].mute,
-				"toggled", G_CALLBACK(mute), &ch[0]);
-		gtk_box_pack_end(GTK_BOX(ch[0].hbox), ch[0].mute, FALSE, FALSE, 0);
-	}
-#endif
-	
 	update_gui(&ch[0]);
 
 	grab_audio_keys();
