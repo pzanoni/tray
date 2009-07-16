@@ -39,20 +39,19 @@ static void grab_audio_keys()
 {
 	KeySym raise_vol_ks, lower_vol_ks, mute_ks;
 
-	/*raise_vol_ks = XStringToKeysym("XF86AudioRaiseVolume");
+#if 0
+	raise_vol_ks = XStringToKeysym("XF86AudioRaiseVolume");
 	lower_vol_ks = XStringToKeysym("XF86AudioLowerVolume");
-	mute_ks = XStringToKeysym("XF86AudioMute"); */
+	mute_ks = XStringToKeysym("XF86AudioMute");
+#else
 	raise_vol_ks = XStringToKeysym("Right");
 	lower_vol_ks = XStringToKeysym("Left");
 	mute_ks = XStringToKeysym("Down");
+#endif
 
 	raise_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), raise_vol_ks);
 	lower_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), lower_vol_ks);
 	mute_kc = XKeysymToKeycode(GDK_DISPLAY(), mute_ks);
-
-	/*printf("raise_vol_kc: %d\n", raise_vol_kc);
-	printf("lower_vol_kc: %d\n", lower_vol_kc);
-	printf("mute_kc: %d\n", mute_kc);*/
 
 	XGrabKey(GDK_DISPLAY(), raise_vol_kc, AnyModifier, GDK_ROOT_WINDOW(),
 					False, GrabModeAsync, GrabModeAsync);
@@ -119,14 +118,22 @@ static void mixer_set(struct channel *c, int vol)
 				SND_MIXER_SCHN_FRONT_RIGHT, vol);
 }
 
-static void mixer_getmute(struct channel *c)
+static int mixer_getmute(struct channel *c)
 {
-	if (c->mute) {
-		snd_mixer_selem_get_playback_switch(elem,
-				SND_MIXER_SCHN_FRONT_LEFT, &c->muteval);
-	} else {
-		c->muteval = 1;
-	}
+	int val;
+
+	snd_mixer_selem_get_playback_switch(elem,
+				SND_MIXER_SCHN_FRONT_LEFT, &val);
+
+	return val;
+}
+
+static void mixer_setmute(struct channel *c, int val)
+{
+	int i;
+
+	for (i = 0; i <= SND_MIXER_SCHN_LAST; i++)
+		snd_mixer_selem_set_playback_switch(elem, i, val);
 }
 
 gboolean mixer_evt_idle;
@@ -147,7 +154,7 @@ static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
 
 	if (cond & G_IO_IN) {
 		/* update mixer status */
-		update_gui (&ch[0]);
+		update_gui(&ch[0]);
 	}
 
 	if (cond & G_IO_HUP) {
@@ -161,17 +168,9 @@ static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
 
 static void update_gui(struct channel *c)
 {
-	mixer_getmute(c);
-	//update_icon(c);
+	gtk_image_set_from_file(GTK_IMAGE(c->image), mixer_getmute(c) ?
+			ICON_PATH "speaker.png" : ICON_PATH "mute.png");
 
-	if (c->mute) {
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c->mute),
-					!c->muteval);
-	} else {
-		c->muteval = 1;
-	}
-
-	//gtk_range_set_value(GTK_RANGE(c->pbar), mixer_get(c));
 	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(c->pbar),
 						(gdouble)mixer_get(c) / 100);
 }
@@ -184,6 +183,7 @@ static void vol_change(GtkRange *range, struct channel *c)
 }
 */
 
+#if 0
 static void mute(GtkWidget *widget, struct channel *c)
 {
 	int val, i;
@@ -197,7 +197,6 @@ static void mute(GtkWidget *widget, struct channel *c)
 }
 
 
-#if 0
 static void click()
 {
 	static int show = 0;
@@ -255,7 +254,9 @@ GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer da
 				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch[0].pbar), val / 100);
 				mixer_set(&ch[0], val);
 			} else if (xke->keycode == mute_kc) {
-				printf("{,un}mute\n");
+				int val = mixer_getmute(&ch[0]);
+				mixer_setmute(&ch[0], !val);
+				update_gui(&ch[0]);
 			}
 		/*case KeyRelease:
 			printf("key release\n");*/
@@ -303,7 +304,7 @@ int main(int argc, char **argv)
 	gtk_container_add(GTK_CONTAINER(window), hbox);
 
 	ch[0].hbox = gtk_hbox_new(FALSE, 5);
-	ch[0].image = gtk_image_new_from_file (ICON_PATH "speaker.png");
+	ch[0].image = gtk_image_new_from_file(ICON_PATH "speaker.png");
 	/*ch[0].pbar = gtk_pbar_new(GTK_ADJUSTMENT(
 		gtk_adjustment_new(mixer_get(&ch[0]), 0, 100, 0, 0, 0)));*/
 	ch[0].pbar = gtk_progress_bar_new();
