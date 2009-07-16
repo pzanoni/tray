@@ -30,8 +30,51 @@ snd_mixer_t *mixer;
 snd_mixer_elem_t *elem;
 snd_mixer_selem_id_t *sid;
 
+KeyCode raise_vol_kc, lower_vol_kc, mute_kc;
+
 static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud);
 static void update_gui(struct channel *c);
+
+static void grab_audio_keys () {
+
+    KeySym raise_vol_ks, lower_vol_ks, mute_ks;
+
+    raise_vol_ks = XStringToKeysym("XF86AudioRaiseVolume");
+    lower_vol_ks = XStringToKeysym("XF86AudioLowerVolume");
+    mute_ks = XStringToKeysym("XF86AudioMute");
+
+    raise_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), raise_vol_ks);
+    lower_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), lower_vol_ks);
+    mute_kc = XKeysymToKeycode(GDK_DISPLAY(), mute_ks);
+
+    printf("raise_vol_kc: %d\n", raise_vol_kc);
+    printf("lower_vol_kc: %d\n", lower_vol_kc);
+    printf("mute_kc: %d\n", mute_kc);
+
+    XGrabKey(GDK_DISPLAY(),
+             raise_vol_kc,
+             AnyModifier,
+             GDK_ROOT_WINDOW(),
+             False,
+             GrabModeAsync,
+             GrabModeAsync);
+
+    XGrabKey(GDK_DISPLAY(),
+             lower_vol_kc,
+             AnyModifier,
+             GDK_ROOT_WINDOW(),
+             False,
+             GrabModeAsync,
+             GrabModeAsync);
+
+    XGrabKey(GDK_DISPLAY(),
+             mute_kc,
+             AnyModifier,
+             GDK_ROOT_WINDOW(),
+             False,
+             GrabModeAsync,
+             GrabModeAsync);
+}
 
 static int mixer_init(char *name)
 {
@@ -205,34 +248,37 @@ static void quit()
 }
 #endif
 
+GdkFilterReturn event_callback(GdkXEvent *gdk_xev,
+			       GdkEvent *gdk_ev,
+			       gpointer data) {
 
-/* This function handles all of the keys which were grabbed via X */
-GdkFilterReturn key_filter(GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
-{
-	int type;
-	int key, keysym;
-	XKeyEvent *xevent;
+	XEvent *xev = (XEvent *) gdk_xev;
+	XKeyEvent *xke;
 
-	xevent = gdk_xevent;
-	type = xevent->type;
-
-	if (type == KeyPress) {
-		key = ((XKeyEvent *) xevent)->keycode;
-		keysym = XKeycodeToKeysym(GDK_DISPLAY(), key, 0);
-
-		printf("caught keysym %i\n", keysym);
-
-#if 0
-		switch (keysym) {
-		case your_keysym:
-			// your key handler code
+	switch (xev->type) {
+		printf("event: %d\n", xev->type);
+		case Expose:
 			break;
-		}
-#endif
+
+		case KeyPress:
+			xke = (XKeyEvent *)xev;
+			if (xke->keycode == raise_vol_kc)
+				printf("volume++\n");
+			else if (xke->keycode == lower_vol_kc)
+				printf("volume--\n");
+			else if (xke->keycode == mute_kc) {
+				printf("{,un}mute\n");
+			}
+		case KeyRelease:
+			printf("key release\n");
+
+		default:
+			break;
 	}
 
 	return GDK_FILTER_CONTINUE;
 }
+
 
 
 int main(int argc, char **argv)
@@ -307,17 +353,11 @@ int main(int argc, char **argv)
 
 	//gtk_status_icon_set_visible(GTK_STATUS_ICON(icon), TRUE);
 
-	display = GDK_DISPLAY();
-	rootwin = GDK_ROOT_WINDOW();
-
-	XGrabKey(display, 97 /*122*/, AnyModifier, rootwin, False, GrabModeAsync,
-							GrabModeAsync);
-	XGrabKey(display, 115 /*123*/, AnyModifier, rootwin, False, GrabModeAsync,
-							GrabModeAsync);
+	grab_audio_keys();
 
 	gtk_widget_show_all(window);
 	gdk_window_raise(window->window);
-	gdk_window_add_filter(window->window, key_filter, NULL);
+	gdk_window_add_filter(NULL, event_callback, NULL);
 
 	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 
