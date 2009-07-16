@@ -9,7 +9,7 @@
 
 #include "tray.h"
 
-#define ICON_PATH ICON_DIR "/tray_mixer/"
+#define ICON_PATH ICON_DIR "/vold/"
 
 struct channel {
 	GtkWidget *hbox;
@@ -21,10 +21,8 @@ struct channel {
 
 Display *display;
 Window rootwin;
-//GtkStatusIcon *icon;
 GtkWidget *window;
 GtkWidget *hbox;
-//GtkWidget *menu, *item;
 struct channel ch[1];
 snd_mixer_t *mixer;
 snd_mixer_elem_t *elem;
@@ -35,46 +33,34 @@ KeyCode raise_vol_kc, lower_vol_kc, mute_kc;
 static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud);
 static void update_gui(struct channel *c);
 
-static void grab_audio_keys () {
 
-    KeySym raise_vol_ks, lower_vol_ks, mute_ks;
+static void grab_audio_keys()
+{
+	KeySym raise_vol_ks, lower_vol_ks, mute_ks;
 
-    raise_vol_ks = XStringToKeysym("XF86AudioRaiseVolume");
-    lower_vol_ks = XStringToKeysym("XF86AudioLowerVolume");
-    mute_ks = XStringToKeysym("XF86AudioMute");
+	/*raise_vol_ks = XStringToKeysym("XF86AudioRaiseVolume");
+	lower_vol_ks = XStringToKeysym("XF86AudioLowerVolume");
+	mute_ks = XStringToKeysym("XF86AudioMute"); */
+	raise_vol_ks = XStringToKeysym("Right");
+	lower_vol_ks = XStringToKeysym("Left");
+	mute_ks = XStringToKeysym("Down");
 
-    raise_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), raise_vol_ks);
-    lower_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), lower_vol_ks);
-    mute_kc = XKeysymToKeycode(GDK_DISPLAY(), mute_ks);
+	raise_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), raise_vol_ks);
+	lower_vol_kc = XKeysymToKeycode(GDK_DISPLAY(), lower_vol_ks);
+	mute_kc = XKeysymToKeycode(GDK_DISPLAY(), mute_ks);
 
-    printf("raise_vol_kc: %d\n", raise_vol_kc);
-    printf("lower_vol_kc: %d\n", lower_vol_kc);
-    printf("mute_kc: %d\n", mute_kc);
+	/*printf("raise_vol_kc: %d\n", raise_vol_kc);
+	printf("lower_vol_kc: %d\n", lower_vol_kc);
+	printf("mute_kc: %d\n", mute_kc);*/
 
-    XGrabKey(GDK_DISPLAY(),
-             raise_vol_kc,
-             AnyModifier,
-             GDK_ROOT_WINDOW(),
-             False,
-             GrabModeAsync,
-             GrabModeAsync);
-
-    XGrabKey(GDK_DISPLAY(),
-             lower_vol_kc,
-             AnyModifier,
-             GDK_ROOT_WINDOW(),
-             False,
-             GrabModeAsync,
-             GrabModeAsync);
-
-    XGrabKey(GDK_DISPLAY(),
-             mute_kc,
-             AnyModifier,
-             GDK_ROOT_WINDOW(),
-             False,
-             GrabModeAsync,
-             GrabModeAsync);
+	XGrabKey(GDK_DISPLAY(), raise_vol_kc, AnyModifier, GDK_ROOT_WINDOW(),
+					False, GrabModeAsync, GrabModeAsync);
+	XGrabKey(GDK_DISPLAY(), lower_vol_kc, AnyModifier, GDK_ROOT_WINDOW(),
+					False, GrabModeAsync, GrabModeAsync);
+	XGrabKey(GDK_DISPLAY(), mute_kc, AnyModifier, GDK_ROOT_WINDOW(),
+					False, GrabModeAsync, GrabModeAsync);
 }
+
 
 static int mixer_init(char *name)
 {
@@ -301,17 +287,6 @@ int main(int argc, char **argv)
 
 	mixer_init(name);
 
-	//icon = gtk_status_icon_new_from_file(ICON_PATH "speaker.png");
-	//g_signal_connect(G_OBJECT(icon), "activate", G_CALLBACK(click), NULL);
-
-	//item = gtk_menu_item_new_with_label(N_("Quit"));
-	//menu = gtk_menu_new();
-	//gtk_widget_show(item);
-	//gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-
-	//g_signal_connect(G_OBJECT(icon), "popup-menu", G_CALLBACK(popup), NULL);
-	//g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(quit), NULL);
-
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
@@ -351,14 +326,12 @@ int main(int argc, char **argv)
 	
 	update_gui(&ch[0]);
 
-	//gtk_status_icon_set_visible(GTK_STATUS_ICON(icon), TRUE);
-
 	grab_audio_keys();
 
 	gtk_widget_show_all(window);
 	gdk_window_raise(window->window);
 	gdk_window_add_filter(NULL, event_callback, NULL);
-
+	g_object_set(G_OBJECT(window), "accept-focus", FALSE, NULL);
 	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 
 	gtk_main();
