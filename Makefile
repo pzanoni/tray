@@ -17,6 +17,7 @@ INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
 LANGS	= pt_BR
 
+
 .c.o:
 	$(CC) -c $(CFLAGS) -o $*.o $<
 
@@ -64,10 +65,14 @@ applet-install:
 	$(INSTALL) -m644 icons/$(APPLET)/*.png $(DESTDIR)$(ICONDIR)/$(APPLET)
 	$(INSTALL) -m755 -s $(APPLET) $(DESTDIR)$(BINDIR)
 	for i in $(LANGS); do \
-		$(INSTALL) -m644 -D intl/$(APPLET)/$$i.mo \
+		if test -f intl/$(APPLET)/$$i.mo; then \
+			$(INSTALL) -m644 -D intl/$(APPLET)/$$i.mo \
 			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/$(APPLET).mo; \
+		fi \
 	done
 
 clean:
 	rm -f core *.o *~ intl/*/*.mo
+
+intl/vold/pt_BR.mo:
 
