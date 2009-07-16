@@ -82,9 +82,13 @@ static void quit()
 static void keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
 	if (event->keyval == GDK_Escape) {
-		gtk_widget_hide_all(window);
-		gdk_keyboard_ungrab(GDK_CURRENT_TIME);
-		gdk_pointer_ungrab(GDK_CURRENT_TIME);
+		if (direct) {
+			quit();
+		} else {
+			gtk_widget_hide_all(window);
+			gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+			gdk_pointer_ungrab(GDK_CURRENT_TIME);
+		}
 	}
 }
 
