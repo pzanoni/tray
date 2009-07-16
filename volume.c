@@ -10,10 +10,11 @@
 #include "tray.h"
 
 #define ICON_PATH ICON_DIR "/vold/"
+#define STEP 5
 
 struct channel {
 	GtkWidget *hbox;
-	GtkWidget *hscale;
+	GtkWidget *pbar;
 	GtkWidget *mute;
 	GtkWidget *image;
 	int muteval;
@@ -94,6 +95,7 @@ static int mixer_init(char *name)
 		g_io_add_watch(channel, G_IO_IN|G_IO_HUP, on_mixer_event, NULL);
 		g_io_channel_unref(channel);
 	}
+
 	return 0;
 }
 
@@ -131,16 +133,15 @@ gboolean mixer_evt_idle;
 
 static gboolean reset_mixer_evt_idle()
 {
-    mixer_evt_idle = 0;
-    return FALSE;
+	mixer_evt_idle = 0;
+	return FALSE;
 }
 
 static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
 {
 	if (mixer_evt_idle == 0) {
 		mixer_evt_idle = g_idle_add_full(G_PRIORITY_DEFAULT,
-						 (GSourceFunc) reset_mixer_evt_idle,
-						 NULL, NULL);
+				 (GSourceFunc)reset_mixer_evt_idle, NULL, NULL);
 		snd_mixer_handle_events (mixer);
 	}
 
@@ -157,13 +158,6 @@ static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
 	return TRUE;
 }
 
-#if 0
-static void update_icon(struct channel *c)
-{
-        gtk_status_icon_set_from_file(icon, c->muteval ?
-			ICON_PATH "speaker.png" : ICON_PATH "mute.png");
-}
-#endif
 
 static void update_gui(struct channel *c)
 {
@@ -177,13 +171,18 @@ static void update_gui(struct channel *c)
 		c->muteval = 1;
 	}
 
-	gtk_range_set_value(GTK_RANGE(c->hscale), mixer_get(c));
+	//gtk_range_set_value(GTK_RANGE(c->pbar), mixer_get(c));
+	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(c->pbar),
+						(gdouble)mixer_get(c) / 100);
 }
 
+
+/*
 static void vol_change(GtkRange *range, struct channel *c)
 {
 	mixer_set(c, gtk_range_get_value(range));
 }
+*/
 
 static void mute(GtkWidget *widget, struct channel *c)
 {
@@ -197,15 +196,6 @@ static void mute(GtkWidget *widget, struct channel *c)
 	//update_icon(c);
 }
 
-static int scale_scroll(GtkScale* scale, GdkEventScroll *e, struct channel *c)
-{
-	int val = gtk_range_get_value((GtkRange*)scale);
-
-	val += e->direction == GDK_SCROLL_UP ? 2 : -2;
-	gtk_range_set_value((GtkRange*)scale, CLAMP(val, 0, 100));
-
-	return 0;
-}
 
 #if 0
 static void click()
@@ -234,12 +224,14 @@ static void quit()
 }
 #endif
 
-GdkFilterReturn event_callback(GdkXEvent *gdk_xev,
-			       GdkEvent *gdk_ev,
-			       gpointer data) {
 
+GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer data)
+{
 	XEvent *xev = (XEvent *) gdk_xev;
 	XKeyEvent *xke;
+	gdouble val;
+
+	val = 100.0 * gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(ch[0].pbar));
 
 	switch (xev->type) {
 		printf("event: %d\n", xev->type);
@@ -248,15 +240,25 @@ GdkFilterReturn event_callback(GdkXEvent *gdk_xev,
 
 		case KeyPress:
 			xke = (XKeyEvent *)xev;
-			if (xke->keycode == raise_vol_kc)
-				printf("volume++\n");
-			else if (xke->keycode == lower_vol_kc)
-				printf("volume--\n");
-			else if (xke->keycode == mute_kc) {
+			if (xke->keycode == raise_vol_kc) {
+				if (val < 100 - STEP)
+					val += STEP;		
+				else
+					val = 100;
+				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch[0].pbar), val / 100);
+				mixer_set(&ch[0], val);
+			} else if (xke->keycode == lower_vol_kc) {
+				if (val > STEP)
+					val -= STEP;
+				else
+					val = 0;
+				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch[0].pbar), val / 100);
+				mixer_set(&ch[0], val);
+			} else if (xke->keycode == mute_kc) {
 				printf("{,un}mute\n");
 			}
-		case KeyRelease:
-			printf("key release\n");
+		/*case KeyRelease:
+			printf("key release\n");*/
 
 		default:
 			break;
@@ -302,18 +304,14 @@ int main(int argc, char **argv)
 
 	ch[0].hbox = gtk_hbox_new(FALSE, 5);
 	ch[0].image = gtk_image_new_from_file (ICON_PATH "speaker.png");
-	ch[0].hscale = gtk_hscale_new(GTK_ADJUSTMENT(
-		gtk_adjustment_new(mixer_get(&ch[0]), 0, 100, 0, 0, 0)));
-	gtk_scale_set_draw_value(GTK_SCALE(ch[0].hscale), FALSE);
-	gtk_range_set_inverted(GTK_RANGE(ch[0].hscale), TRUE);
+	/*ch[0].pbar = gtk_pbar_new(GTK_ADJUSTMENT(
+		gtk_adjustment_new(mixer_get(&ch[0]), 0, 100, 0, 0, 0)));*/
+	ch[0].pbar = gtk_progress_bar_new();
+	//gtk_scale_set_draw_value(GTK_SCALE(ch[0].pbar), FALSE);
+	//gtk_range_set_inverted(GTK_RANGE(ch[0].pbar), TRUE);
 	gtk_container_add(GTK_CONTAINER(hbox), ch[0].hbox);
 	gtk_box_pack_start(GTK_BOX(ch[0].hbox), ch[0].image, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(ch[0].hbox), ch[0].hscale, TRUE, TRUE, 0);
-
-	g_signal_connect((gpointer)ch[0].hscale,
-			"value_changed", G_CALLBACK(vol_change), &ch[0]);
-	g_signal_connect(ch[0].hscale,
-			"scroll-event", G_CALLBACK(scale_scroll), &ch[0]);
+	gtk_box_pack_start(GTK_BOX(ch[0].hbox), ch[0].pbar, TRUE, TRUE, 0);
 
 #if 0
 	if (snd_mixer_selem_has_playback_switch(elem)) {
