@@ -11,6 +11,8 @@
 
 #define ICON_PATH ICON_DIR "/vold/"
 #define STEP 5
+#define COUNT 5
+#define TIMEOUT 200
 
 struct channel {
 	GtkWidget *hbox;
@@ -28,6 +30,7 @@ struct channel ch;
 snd_mixer_t *mixer;
 snd_mixer_elem_t *elem;
 snd_mixer_selem_id_t *sid;
+int show_counter;
 
 KeyCode raise_vol_kc, lower_vol_kc, mute_kc;
 
@@ -39,7 +42,7 @@ static void grab_audio_keys()
 {
 	KeySym raise_vol_ks, lower_vol_ks, mute_ks;
 
-#if 0
+#if 1
 	raise_vol_ks = XStringToKeysym("XF86AudioRaiseVolume");
 	lower_vol_ks = XStringToKeysym("XF86AudioLowerVolume");
 	mute_ks = XStringToKeysym("XF86AudioMute");
@@ -176,21 +179,32 @@ static void update_gui(struct channel *c)
 }
 
 
-#if 0
-static void click()
+static void hide_window()
 {
-	static int show = 0;
+	gtk_widget_hide_all(window);
+}
 
-	if (show) {
-		gtk_widget_hide_all(window);
-	} else {
-		gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
+gboolean check_timeout(gpointer data)
+{
+	if (show_counter == 0) {
+		hide_window();
+		return FALSE;
+	}
+	show_counter--;
+	return TRUE;
+}
+
+static void show_window()
+{
+	if (!show_counter) {
+		g_timeout_add(TIMEOUT, check_timeout, NULL);
 		gtk_widget_show_all(window);
+		gdk_window_raise(window->window);
+		gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
 	}
 
-	show ^= 1;
+	show_counter = COUNT;
 }
-#endif
 
 
 GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer data)
@@ -202,13 +216,10 @@ GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer da
 	val = 100.0 * gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(ch.pbar));
 
 	switch (xev->type) {
-		printf("event: %d\n", xev->type);
-		case Expose:
-			break;
-
 		case KeyPress:
 			xke = (XKeyEvent *)xev;
 			if (xke->keycode == raise_vol_kc) {
+				show_window();
 				if (val < 100 - STEP)
 					val += STEP;		
 				else
@@ -216,6 +227,7 @@ GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer da
 				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch.pbar), val / 100);
 				mixer_set(&ch, val);
 			} else if (xke->keycode == lower_vol_kc) {
+				show_window();
 				if (val > STEP)
 					val -= STEP;
 				else
@@ -223,7 +235,9 @@ GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer da
 				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch.pbar), val / 100);
 				mixer_set(&ch, val);
 			} else if (xke->keycode == mute_kc) {
-				int val = mixer_getmute(&ch);
+				int val;
+				show_window();
+				val = mixer_getmute(&ch);
 				mixer_setmute(&ch, !val);
 				update_gui(&ch);
 			}
@@ -283,11 +297,9 @@ int main(int argc, char **argv)
 
 	grab_audio_keys();
 
-	gtk_widget_show_all(window);
-	gdk_window_raise(window->window);
 	gdk_window_add_filter(NULL, event_callback, NULL);
 	g_object_set(G_OBJECT(window), "accept-focus", FALSE, NULL);
-	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
+	show_counter = 0;
 
 	gtk_main();
 
