@@ -24,7 +24,7 @@ Display *display;
 Window rootwin;
 GtkWidget *window;
 GtkWidget *hbox;
-struct channel ch[1];
+struct channel ch;
 snd_mixer_t *mixer;
 snd_mixer_elem_t *elem;
 snd_mixer_selem_id_t *sid;
@@ -154,7 +154,7 @@ static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
 
 	if (cond & G_IO_IN) {
 		/* update mixer status */
-		update_gui(&ch[0]);
+		update_gui(&ch);
 	}
 
 	if (cond & G_IO_HUP) {
@@ -199,7 +199,7 @@ GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer da
 	XKeyEvent *xke;
 	gdouble val;
 
-	val = 100.0 * gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(ch[0].pbar));
+	val = 100.0 * gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(ch.pbar));
 
 	switch (xev->type) {
 		printf("event: %d\n", xev->type);
@@ -213,19 +213,19 @@ GdkFilterReturn event_callback(GdkXEvent *gdk_xev, GdkEvent *gdk_ev, gpointer da
 					val += STEP;		
 				else
 					val = 100;
-				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch[0].pbar), val / 100);
-				mixer_set(&ch[0], val);
+				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch.pbar), val / 100);
+				mixer_set(&ch, val);
 			} else if (xke->keycode == lower_vol_kc) {
 				if (val > STEP)
 					val -= STEP;
 				else
 					val = 0;
-				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch[0].pbar), val / 100);
-				mixer_set(&ch[0], val);
+				gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ch.pbar), val / 100);
+				mixer_set(&ch, val);
 			} else if (xke->keycode == mute_kc) {
-				int val = mixer_getmute(&ch[0]);
-				mixer_setmute(&ch[0], !val);
-				update_gui(&ch[0]);
+				int val = mixer_getmute(&ch);
+				mixer_setmute(&ch, !val);
+				update_gui(&ch);
 			}
 		/*case KeyRelease:
 			printf("key release\n");*/
@@ -272,14 +272,14 @@ int main(int argc, char **argv)
 	hbox = gtk_hbox_new(TRUE, 5);
 	gtk_container_add(GTK_CONTAINER(window), hbox);
 
-	ch[0].hbox = gtk_hbox_new(FALSE, 5);
-	ch[0].image = gtk_image_new_from_file(ICON_PATH "speaker.png");
-	ch[0].pbar = gtk_progress_bar_new();
-	gtk_container_add(GTK_CONTAINER(hbox), ch[0].hbox);
-	gtk_box_pack_start(GTK_BOX(ch[0].hbox), ch[0].image, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(ch[0].hbox), ch[0].pbar, TRUE, TRUE, 0);
+	ch.hbox = gtk_hbox_new(FALSE, 5);
+	ch.image = gtk_image_new_from_file(ICON_PATH "speaker.png");
+	ch.pbar = gtk_progress_bar_new();
+	gtk_container_add(GTK_CONTAINER(hbox), ch.hbox);
+	gtk_box_pack_start(GTK_BOX(ch.hbox), ch.image, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(ch.hbox), ch.pbar, TRUE, TRUE, 0);
 
-	update_gui(&ch[0]);
+	update_gui(&ch);
 
 	grab_audio_keys();
 
