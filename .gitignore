@@ -1,2 +1,9 @@
+*.swp
 *.o
 core
+tray_eject
+tray_keyleds
+tray_mixer
+tray_randr
+tray_reboot
+vold
