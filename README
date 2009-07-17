@@ -1,9 +1,13 @@
 
 Claudio's quick-and-dirty systray applications
-Copyright (C) 2008 Claudio Matsuoka
+Copyright (C) 2008 Claudio Matsuoka and other authors
 
 - tray_reboot: show a reboot menu (for fastinit-based netbooks)
 - tray_keyboard: show capslock/numlock status for systems without LEDs
+- tray_randr:
+- tray_mixer:
+- tray_eject:
+- vold:
 
 tray_reboot icons are from the Crystal icon set and are distributed under
 the LGPL.
