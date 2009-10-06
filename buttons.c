@@ -9,9 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gtk/gtk.h>
-#include <gdk/gdkx.h>
-#include <gdk/gdkkeysyms.h>
-#include <X11/Xlib.h>
 #include <getopt.h>
 
 #include "tray.h"
@@ -139,10 +136,6 @@ int main(int argc, char **argv)
 	//gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
 	gtk_window_set_title(GTK_WINDOW(window), N_("Quit session"));
-
-	GdkPixbuf *pixbuf;
-	pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/gnome/scalable/actions/gtk-quit.svg", NULL);
-	gtk_window_set_icon(GTK_WINDOW(window), pixbuf);
 
 	click();
 
