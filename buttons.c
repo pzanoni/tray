@@ -1,3 +1,11 @@
+/*
+ * This is a silly panel application that executes arbitrary commands
+ * when the buttons are pressed. Use -v for vertical bar, -d for debug
+ * and -f to specify the configuration file.
+ *
+ * Config file line format is: <command>^<icon path>
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <gtk/gtk.h>
