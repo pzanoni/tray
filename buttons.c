@@ -1,7 +1,6 @@
 /*
  * This is a silly panel application that executes arbitrary commands
- * when the buttons are pressed. Use -v for vertical bar, -d for debug
- * and -f to specify the configuration file.
+ * when the buttons are pressed.
  *
  * Config file line format is: <command>^<icon path>
  */
@@ -13,6 +12,7 @@
 
 #include "tray.h"
 
+#define ICON_PATH ICON_DIR "/tray_buttons/"
 #define MAX_BUTTONS 16
 
 GtkWidget *window;
@@ -21,7 +21,9 @@ GtkWidget *box;
 GtkWidget *menu, *item;
 char *command[MAX_BUTTONS];
 int num_buttons;
-int direction;
+int vertical;
+int direct;
+int center;
 char *config = "/etc/buttons.conf";
 int debug = 0;
 
@@ -33,13 +35,28 @@ static void option(GtkButton *button, int n)
 		system(command[n]);
 }
 	 
+static void popup()
+{
+	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
+					gtk_get_current_event_time());
+}
+
+static void quit()
+{
+	gtk_main_quit();
+}
+
 static void click()
 {
-	gtk_widget_show_all(window);
-	//gdk_pointer_grab(window->window, TRUE, 0, NULL, NULL, GDK_CURRENT_TIME);
-	//gdk_keyboard_grab(window->window, TRUE, GDK_CURRENT_TIME);
-	gdk_window_raise(window->window);
-	gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
+	if (GTK_WIDGET_VISIBLE(window)) {
+		gtk_widget_hide_all(window);
+	} else {
+		gtk_widget_show_all(window);
+		//gdk_pointer_grab(window->window, TRUE, 0, NULL, NULL, GDK_CURRENT_TIME);
+		//gdk_keyboard_grab(window->window, TRUE, GDK_CURRENT_TIME);
+		gdk_window_raise(window->window);
+		gtk_window_set_keep_above(GTK_WINDOW(window), TRUE);
+	}
 }
 
 static void set_button(GtkWidget **b, int p, char *i)
@@ -89,15 +106,20 @@ static int read_config(char *conf)
 
 int main(int argc, char **argv)
 {
+	struct GtkStatusIcon *icon1 = NULL;
 	GtkSettings *settings;
 	GError *error = NULL;
 	GOptionContext *context;
 	static GOptionEntry entries[] = {
-		{ "debug", 'd', 0, G_OPTION_ARG_NONE, &debug,
+		{ "debug", 'D', 0, G_OPTION_ARG_NONE, &debug,
 				"Print debug information", NULL },
+		{ "direct", 'd', 0, G_OPTION_ARG_NONE, &direct,
+				"Don't show tray icon", NULL },
+		{ "center", 'c', 0, G_OPTION_ARG_NONE, &center,
+				"Center button panel", NULL },
 		{ "config", 'f', 0, G_OPTION_ARG_FILENAME, &config,
 				"Use this configuration file", "name" },
-		{ "vertical", 'v', 0, G_OPTION_ARG_NONE, &direction,
+		{ "vertical", 'v', 0, G_OPTION_ARG_NONE, &vertical,
 				"Use vertical icon bar", NULL },
 		{ NULL }
 	};
@@ -105,8 +127,10 @@ int main(int argc, char **argv)
 	bindtextdomain("tray_buttons", LOCALE_DIR);
 	textdomain("tray_buttons");
 
-	direction = 0;
-	num_buttons = 0;
+	direct = 0;		/* display window without tray icon */
+	vertical = 0;		/* horizontal or vertical bar */
+	num_buttons = 0;	/* number of buttons in bar */
+	center = 0;		/* center button panel */
 
 	context = g_option_context_new("- panel with configurable buttons");
 	g_option_context_add_main_entries(context, entries, "tray_buttons");
@@ -115,9 +139,28 @@ int main(int argc, char **argv)
 
 	gtk_init(&argc, &argv);
 
+	/* tray icon stuff */
+	if (!direct) {
+		icon1 = (struct GtkStatusIcon *)
+			gtk_status_icon_new_from_file(ICON_PATH "key.png");
+		g_signal_connect(G_OBJECT(icon1), "activate",
+			G_CALLBACK(click), NULL);
+
+		item = gtk_menu_item_new_with_label(N_("Quit"));
+		menu = gtk_menu_new();
+		gtk_widget_show(item);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+
+		g_signal_connect(G_OBJECT(icon1), "popup-menu",
+						G_CALLBACK(popup), NULL);
+		g_signal_connect(G_OBJECT(item), "activate",
+						G_CALLBACK(quit), NULL);
+	}
+	/* end of tray icon stuff */
+
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
-	box = direction ? gtk_vbox_new(TRUE, TRUE) : gtk_hbox_new(TRUE, TRUE);
+	box = vertical ? gtk_vbox_new(TRUE, TRUE) : gtk_hbox_new(TRUE, TRUE);
 
 	gtk_container_add(GTK_CONTAINER(window), box);
 
@@ -134,11 +177,19 @@ int main(int argc, char **argv)
 	settings = gtk_settings_get_default();
 	g_object_set (settings, "gtk-button-images", TRUE, NULL);
 
-	//gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
-	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
-	gtk_window_set_title(GTK_WINDOW(window), N_("Quit session"));
+	if (center) {
+		gtk_window_set_position(GTK_WINDOW(window),
+					GTK_WIN_POS_CENTER_ALWAYS);
+	}
 
-	click();
+	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
+	gtk_window_set_title(GTK_WINDOW(window), N_("Buttons"));
+
+	if (direct) {
+		click();
+	} else {
+		gtk_status_icon_set_visible(GTK_STATUS_ICON(icon1), TRUE);
+	}
 
 	gtk_main();
 
