@@ -13,7 +13,7 @@ LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
 BINS	= tray_reboot tray_keyleds tray_mixer tray_eject tray_randr \
-	  buttons vold
+	  tray_buttons vold
 INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
 LANGS	= pt_BR
@@ -54,7 +54,7 @@ tray_eject: eject.o
 tray_randr: randr.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
 
-buttons: buttons.o
+tray_buttons: buttons.o
 	$(LD) $(LDFLAGS) -o $@ $+ $(LIBS)
 
 vold: volume.o

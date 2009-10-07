@@ -90,7 +90,17 @@ static int read_config(char *conf)
 int main(int argc, char **argv)
 {
 	GtkSettings *settings;
-	int o;
+	GError *error = NULL;
+	GOptionContext *context;
+	static GOptionEntry entries[] = {
+		{ "debug", 'd', 0, G_OPTION_ARG_NONE, &debug,
+				"Print debug information", NULL },
+		{ "config", 'f', 0, G_OPTION_ARG_FILENAME, &config,
+				"Use this configuration file", "name" },
+		{ "vertical", 'v', 0, G_OPTION_ARG_NONE, &direction,
+				"Use vertical icon bar", NULL },
+		{ NULL }
+	};
 
 	bindtextdomain("tray_buttons", LOCALE_DIR);
 	textdomain("tray_buttons");
@@ -98,19 +108,10 @@ int main(int argc, char **argv)
 	direction = 0;
 	num_buttons = 0;
 
-	while ((o = getopt(argc, argv, "df:v")) >= 0) {
-		switch (o) {
-		case 'd':
-			debug++;
-			break;
-		case 'f':
-			config = optarg;
-			break;
-		case 'v':
-			direction = 1;
-			break;
-		}
-	}
+	context = g_option_context_new("- panel with configurable buttons");
+	g_option_context_add_main_entries(context, entries, "tray_buttons");
+	g_option_context_add_group(context, gtk_get_option_group(TRUE));
+	g_option_context_parse(context, &argc, &argv, &error);
 
 	gtk_init(&argc, &argv);
 
