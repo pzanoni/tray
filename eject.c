@@ -289,6 +289,7 @@ int main(int argc, char **argv)
 
 	icon = (GtkStatusIcon *)
                         gtk_status_icon_new_from_file(ICON_PATH "dev1.png");
+	update_status();
 
 	menu = gtk_menu_new();
 
