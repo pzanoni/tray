@@ -78,7 +78,7 @@ static void eject_device(gpointer key, gpointer value, gpointer user_data)
 			mountcmd = "pumount";
 		else
 			mountcmd = "umount";
-		snprintf(cmd, 256, "%s %s", mountcmd, m->mountpoint);
+		snprintf(cmd, 256, "%s \"%s\"", mountcmd, m->mountpoint);
 		res |= system(cmd);
 	}
 }
