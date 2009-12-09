@@ -70,13 +70,14 @@ static int res = 0;
 static void eject_device(gpointer key, gpointer value, gpointer user_data)
 {
 	struct mdev *m = value;
-	char cmd[256], mountcmd[8];
 
 	if (value) {
+		char cmd[256];
+            	char *mountcmd;
 		if (!access("/usr/bin/pumount", X_OK))
-			snprintf(mountcmd, 8, "%s", "pumount");
+			mountcmd = "pumount";
 		else
-			snprintf(mountcmd, 8, "%s", "umount");
+			mountcmd = "umount";
 		snprintf(cmd, 256, "%s %s", mountcmd, m->mountpoint);
 		res |= system(cmd);
 	}
