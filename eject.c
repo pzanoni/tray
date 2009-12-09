@@ -74,7 +74,9 @@ static void eject_device(gpointer key, gpointer value, gpointer user_data)
 	if (value) {
 		char cmd[256];
             	char *mountcmd;
-		if (!access("/usr/bin/pumount", X_OK))
+		if (!access("/usr/bin/halevt-umount", X_OK))
+			mountcmd = "halevt-umount";
+		else if (!access("/usr/bin/pumount", X_OK))
 			mountcmd = "pumount";
 		else
 			mountcmd = "umount";
