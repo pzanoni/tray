@@ -72,17 +72,17 @@ int main(int argc, char **argv)
 
 	menu = gtk_menu_new();
 
-	newitem(&item_swext,   N_("Switch to external display"), CMD_SWEXT);
-	newitem(&item_swint,   N_("Switch to built-in display"), CMD_SWINT);
-	newitem(&item_clone,   N_("Use both displays"), CMD_CLONE);
+	newitem(&item_swext,   _("Switch to external display"), CMD_SWEXT);
+	newitem(&item_swint,   _("Switch to built-in display"), CMD_SWINT);
+	newitem(&item_clone,   _("Use both displays"), CMD_CLONE);
 
 	sep = gtk_separator_menu_item_new();
 	gtk_widget_show(sep);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
 
-	newitem(&item_ext1024, N_("Set ext. resolution to 1024x768"), CMD_1024);
-	newitem(&item_ext800,  N_("Set ext. resolution to 800x600"), CMD_800);
-	newitem(&item_ext640,  N_("Set ext. resolution to 640x480"), CMD_640);
+	newitem(&item_ext1024, _("Set ext. resolution to 1024x768"), CMD_1024);
+	newitem(&item_ext800,  _("Set ext. resolution to 800x600"), CMD_800);
+	newitem(&item_ext640,  _("Set ext. resolution to 640x480"), CMD_640);
 
 	g_signal_connect(G_OBJECT(icon), "popup-menu",
 						G_CALLBACK(popup), NULL);
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 	gtk_widget_show(sep);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
 
-	item_quit = gtk_menu_item_new_with_label(N_("Quit"));
+	item_quit = gtk_menu_item_new_with_label(_("Quit"));
 	gtk_widget_show(item_quit);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item_quit);
 	g_signal_connect(G_OBJECT(item_quit), "activate", G_CALLBACK(quit), NULL);

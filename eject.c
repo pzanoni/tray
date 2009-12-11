@@ -146,14 +146,14 @@ static void add_mount(const char *udi, char *mountpoint)
 		return;
 	}
 
-	snprintf(txt, 80, "%s %s", N_("Safely remove"),
+	snprintf(txt, 80, "%s %s", _("Safely remove"),
 					mountpoint + strlen(MEDIA_DIR));
 	m->item = gtk_menu_item_new_with_label(txt);
         gtk_widget_show(m->item);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), m->item);
 	g_signal_connect(G_OBJECT(m->item), "activate", G_CALLBACK(eject), m);
 
-        snprintf(txt, 80, "%s %s", N_("Access content on"),
+        snprintf(txt, 80, "%s %s", _("Access content on"),
 		                        mountpoint + strlen(MEDIA_DIR));
         m->item_content = gtk_menu_item_new_with_label(txt);
         gtk_widget_show(m->item_content);
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
 
 	menu = gtk_menu_new();
 
-	item = gtk_menu_item_new_with_label(N_("Safely remove all"));
+	item = gtk_menu_item_new_with_label(_("Safely remove all"));
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(eject), NULL);
@@ -315,7 +315,7 @@ int main(int argc, char **argv)
 			GTK_STOCK_OK, NULL);
 	gtk_window_set_icon_from_file(GTK_WINDOW(dialog), ICON_PATH "error.png", NULL);
 
-	msg = gtk_label_new(N_("Unable to unmount this device. Some\napplication is likely to be using it.\nPlease close the offending application\nand try again."));
+	msg = gtk_label_new(_("Unable to unmount this device. Some\napplication is likely to be using it.\nPlease close the offending application\nand try again."));
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), msg, TRUE, TRUE, 10);
         gtk_widget_show(msg);
 

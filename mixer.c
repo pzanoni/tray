@@ -314,7 +314,7 @@ int main(int argc, char **argv)
 	icon = gtk_status_icon_new_from_file(ICON_PATH "speaker.png");
 	g_signal_connect(G_OBJECT(icon), "activate", G_CALLBACK(click), NULL);
 
-	item = gtk_menu_item_new_with_label(N_("Quit"));
+	item = gtk_menu_item_new_with_label(_("Quit"));
 	menu = gtk_menu_new();
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
