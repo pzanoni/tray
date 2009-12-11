@@ -16,7 +16,7 @@ BINS	= tray_reboot tray_keyleds tray_mixer tray_eject tray_randr \
 	  tray_buttons vold
 INSTS	= $(BINS:=-install)
 LOCS	= $(BINS)
-LANGS	= pt_BR
+LANGS	= pt_BR fr_FR de_DE es_ES it_IT nl_NL pl_PL pt_PT.po zh_CN
 
 
 .c.o:

@@ -1,14 +1,14 @@
-# translation of pt_BR.po to brazilian portuguese
+# translation of fr_FR.po to brazilian portuguese
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Ednilson Miura <miura@mandriva.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: pt_BR\n"
+"Project-Id-Version: fr_FR\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-12-01 17:34-0200\n"
-"PO-Revision-Date: 2008-12-08 12:52-0200\n"
+"PO-Revision-Date: 2008-12-08 12:53-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: brazilian portuguese <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: keyleds.c:87
+#: mixer.c:188
 msgid "Quit"
-msgstr "Sair"
+msgstr "Quitter"
+
+#: mixer.c:223
+msgid "Mute"
+msgstr "Muet"
 

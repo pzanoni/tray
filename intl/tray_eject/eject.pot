@@ -8,22 +8,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-29 07:56-0300\n"
+"POT-Creation-Date: 2008-12-01 17:33-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#:
+#: eject.c:141
 msgid "Safely remove"
 msgstr ""
 
-#:
+#: eject.c:148
+msgid "Access content on"
+msgstr ""
+
+#: eject.c:289
 msgid "Safely remove all"
 msgstr ""
 
-#:
-msgid "Unable to unmount this device. Some\napplication is likely to be using it.\nPlease close the offending application\nand try again."
+#: eject.c:309
+msgid ""
+"Unable to unmount this device. Some\n"
+"application is likely to be using it.\n"
+"Please close the offending application\n"
+"and try again."
 msgstr ""

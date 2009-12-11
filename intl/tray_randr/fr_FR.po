@@ -1,14 +1,14 @@
-# translation of pt_BR.po to brazilian portuguese
+# translation of fr_FR.po to brazilian portuguese
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Ednilson Miura <miura@mandriva.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: pt_BR\n"
+"Project-Id-Version: fr_FR\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-12-01 17:35-0200\n"
-"PO-Revision-Date: 2008-12-08 12:59-0200\n"
+"PO-Revision-Date: 2008-12-08 13:01-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: brazilian portuguese <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,37 +18,37 @@ msgstr ""
 
 #: randr.c:78
 msgid "Switch to external display"
-msgstr "Alternar para display externo"
+msgstr "Permuter vers un affichage externe"
 
 #: randr.c:79
 msgid "Switch to built-in display"
-msgstr "Alternar para display interno"
+msgstr "Permuter vers un affichage interne"
 
 #: randr.c:80
 msgid "Copy the flatpanel on the external screen"
-msgstr "Copiar a tela para o monitor externo"
+msgstr "Copier le bureau vers un écran externe"
 
 #: randr.c:81
 msgid "Use external screen to extend the panel on the left"
-msgstr "Usar monitor externo para extender o painel à esquerda"
+msgstr "Utiliser un écran externe pour étendre le bureau vers la gauche"
 
 #: randr.c:82
 msgid "Use external screen to extend the panel on the right"
-msgstr "Usar o monitor externo para extender o painel à direita"
+msgstr "Utiliser un écran externe pour étendre le bureau vers la droite"
 
 #: randr.c:88
 msgid "Set ext. resolution to 1024x768"
-msgstr ""
+msgstr "Choisir une résolution ext. de 1024x768"
 
 #: randr.c:89
 msgid "Set ext. resolution to 800x600"
-msgstr "Alternar resolução externa para 800x600"
+msgstr "Choisir une résolution ext. de 800x600"
 
 #: randr.c:90
 msgid "Set ext. resolution to 640x480"
-msgstr "Alternar resolução externa para 640x480"
+msgstr "Choisir une résolution ext. de 640x480"
 
 #: randr.c:99
 msgid "Quit"
-msgstr "Sair"
+msgstr "Quitter"
 

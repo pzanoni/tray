@@ -1,16 +1,16 @@
-# translation of pt_BR.po to brazilian portuguese
+# translation of it_IT.po to brazilian portuguese
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Ednilson Miura <miura@mandriva.com>, 2008.
+# Ednilson Miura <miura@mandriva.com>, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: pt_BR\n"
+"Project-Id-Version: it_IT\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-12-01 17:33-0200\n"
-"PO-Revision-Date: 2008-12-08 11:17-0200\n"
+"PO-Revision-Date: 2009-01-08 15:56-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
-"Language-Team: brazilian portuguese <en@li.org>\n"
+"Language-Team: <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,15 +18,15 @@ msgstr ""
 
 #: eject.c:141
 msgid "Safely remove"
-msgstr "Remover com segurança"
+msgstr "rimozione sicura"
 
 #: eject.c:148
 msgid "Access content on"
-msgstr "Acessar conteúdo"
+msgstr "accesso contenuto presente su"
 
 #: eject.c:289
 msgid "Safely remove all"
-msgstr "Remover todos"
+msgstr "rimozione sicura di tutte le periferiche"
 
 #: eject.c:309
 msgid ""
@@ -34,5 +34,5 @@ msgid ""
 "application is likely to be using it.\n"
 "Please close the offending application\n"
 "and try again."
-msgstr "Não foi possível remover o dispositivo.\nVerifique se ele está em uso por\nalguma aplicação e tente novamente."
+msgstr "Impossibile rimuovere la periferica. Alcune\n applicazioni potebbero essere ancora in uso. Si\n prega di chiudere le applicazioni ancora attive e\n riprovare."
 
