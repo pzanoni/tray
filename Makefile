@@ -12,10 +12,11 @@ LDFLAGS	=
 LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
-BINS	= tray_reboot tray_keyleds tray_mixer tray_eject tray_randr \
-	  tray_buttons vold
+T_BINS= tray_reboot tray_keyleds tray_mixer tray_eject tray_randr
+U_BINS = tray_buttons
+S_BINS	= vold
+BINS	= $(U_BINS) $(T_BINS) $(S_BINS)
 INSTS	= $(BINS:=-install)
-LOCS	= $(BINS)
 LANGS	= pt_BR fr_FR de_DE es_ES it_IT nl_NL pl_PL pt_PT.po zh_CN
 
 
@@ -30,7 +31,7 @@ all: $(BINS)
 install: locale $(INSTS)
 
 locale:
-	@for i in $(LOCS); do \
+	@for i in $(T_BINS); do \
 		for j in $(LANGS); do \
 			$(MAKE) intl/$$i/$$j.mo; \
 		done \
@@ -77,6 +78,3 @@ applet-install:
 
 clean:
 	rm -f core *.o *~ intl/*/*.mo
-
-intl/vold/pt_BR.mo:
-
