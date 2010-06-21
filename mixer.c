@@ -13,6 +13,7 @@
 
 struct channel {
 	GtkWidget *vbox;
+	GtkWidget *name;
 	GtkWidget *vscale;
 	GtkWidget *mute;
 	int muteval;
@@ -22,7 +23,7 @@ GtkStatusIcon *icon;
 GtkWidget *window;
 GtkWidget *hbox;
 GtkWidget *menu, *item;
-struct channel ch[1];
+struct channel ch[2];
 snd_mixer_t *mixer;
 snd_mixer_elem_t *elem;
 snd_mixer_selem_id_t *sid;
@@ -198,18 +199,50 @@ static void quit()
 	gtk_main_quit();
 }
 
+static void add_channel(struct channel *ch, char *name)
+{
+	/* TODO: make generic function for ch[n] */
+	ch->vbox = gtk_vbox_new(FALSE, 5);
+	ch->name = gtk_label_new(name);
+	gtk_label_set_justify((GtkLabel *)ch->name, GTK_JUSTIFY_CENTER);
+	ch->vscale = gtk_vscale_new(GTK_ADJUSTMENT(
+		gtk_adjustment_new(mixer_get(ch), 0, 100, 0, 0, 0)));
+	gtk_scale_set_draw_value(GTK_SCALE(ch->vscale), FALSE);
+	gtk_range_set_inverted(GTK_RANGE(ch->vscale), TRUE);
+	gtk_container_add(GTK_CONTAINER(hbox), ch->vbox);
+	gtk_box_pack_start(GTK_BOX(ch[0].vbox), ch->vscale, TRUE, TRUE, 0);
+
+	g_signal_connect((gpointer)ch->vscale,
+			"value_changed", G_CALLBACK(vol_change), ch);
+	g_signal_connect(ch->vscale,
+			"scroll-event", G_CALLBACK(scale_scroll), ch);
+
+	if (snd_mixer_selem_has_playback_switch(elem)) {
+		ch->mute = gtk_check_button_new_with_label("Mute");
+		g_signal_connect((gpointer)ch->mute,
+				"toggled", G_CALLBACK(mute), ch);
+		gtk_box_pack_end(GTK_BOX(ch->vbox), ch->mute, FALSE, FALSE, 0);
+	}
+	
+	update_gui(ch);
+}
+
 int main(int argc, char **argv)
 {
 	int o;
 	char *name = "Master";
+	int showinput = 0;
 
 	bindtextdomain("tray_mixer", LOCALE_DIR);
 	textdomain("tray_mixer");
 
-	while ((o = getopt(argc, argv, "e:")) >= 0) {
+	while ((o = getopt(argc, argv, "e:i")) >= 0) {
 		switch (o) {
 		case 'e':
 			name = optarg;
+			break;
+		case 'i':
+			showinput = 1;
 			break;
 		}
 	}
@@ -241,28 +274,10 @@ int main(int argc, char **argv)
 	hbox = gtk_hbox_new(TRUE, 5);
 	gtk_container_add(GTK_CONTAINER(window), hbox);
 
-	/* TODO: make generic function for ch[n] */
-	ch[0].vbox = gtk_vbox_new(FALSE, 5);
-	ch[0].vscale = gtk_vscale_new(GTK_ADJUSTMENT(
-		gtk_adjustment_new(mixer_get(&ch[0]), 0, 100, 0, 0, 0)));
-	gtk_scale_set_draw_value(GTK_SCALE(ch[0].vscale), FALSE);
-	gtk_range_set_inverted(GTK_RANGE(ch[0].vscale), TRUE);
-	gtk_container_add(GTK_CONTAINER(hbox), ch[0].vbox);
-	gtk_box_pack_start(GTK_BOX(ch[0].vbox), ch[0].vscale, TRUE, TRUE, 0);
+	add_channel(&ch[0], "Vol");
 
-	g_signal_connect((gpointer)ch[0].vscale,
-			"value_changed", G_CALLBACK(vol_change), &ch[0]);
-	g_signal_connect(ch[0].vscale,
-			"scroll-event", G_CALLBACK(scale_scroll), &ch[0]);
-
-	if (snd_mixer_selem_has_playback_switch(elem)) {
-		ch[0].mute = gtk_check_button_new_with_label("Mute");
-		g_signal_connect((gpointer)ch[0].mute,
-				"toggled", G_CALLBACK(mute), &ch[0]);
-		gtk_box_pack_end(GTK_BOX(ch[0].vbox), ch[0].mute, FALSE, FALSE, 0);
-	}
-	
-	update_gui(&ch[0]);
+	if (showinput)
+		add_channel(&ch[1], "Mic");
 
 	gtk_status_icon_set_visible(GTK_STATUS_ICON(icon), TRUE);
 
