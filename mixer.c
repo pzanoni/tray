@@ -100,10 +100,12 @@ static void _set_volume(snd_mixer_elem_t *elem, int playback, int n, long val)
 
 static void _get_switch(snd_mixer_elem_t *elem, int playback, int n, int *val)
 {
-	if (playback)
+	if (playback) {
 		snd_mixer_selem_get_playback_switch(elem, n, val);
-	else
+	} else {
 		snd_mixer_selem_get_capture_switch(elem, n, val);
+		*val = !*val;
+	}
 }
 
 static void _set_switch(snd_mixer_elem_t *elem, int playback, int n, int val)
@@ -111,7 +113,7 @@ static void _set_switch(snd_mixer_elem_t *elem, int playback, int n, int val)
 	if (playback)
 		snd_mixer_selem_set_playback_switch(elem, n, val);
 	else
-		snd_mixer_selem_set_capture_switch(elem, n, val);
+		snd_mixer_selem_set_capture_switch(elem, n, !val);
 }
 
 static int _has_switch(snd_mixer_elem_t *elem, int playback)
@@ -197,7 +199,7 @@ static void update_gui(struct channel *c)
 
 	if (c->mute) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c->mute),
-					!c->muteval);
+							!c->muteval);
 	} else {
 		c->muteval = 1;
 	}
@@ -273,7 +275,8 @@ static void add_channel(struct channel *c)
 			"scroll-event", G_CALLBACK(scale_scroll), c);
 
 	if (_has_switch(c->elem, c->playback)) {
-		c->mute = gtk_check_button_new_with_label("Mute");
+		c->mute = gtk_check_button_new_with_label(
+				c->playback ? "Mute" : "Capture");
 		g_signal_connect((gpointer)c->mute,
 				"toggled", G_CALLBACK(mute), c);
 		gtk_box_pack_end(GTK_BOX(c->vbox), c->mute, FALSE, FALSE, 0);
@@ -297,11 +300,11 @@ int main(int argc, char **argv)
 		case 'e':
 			name = optarg;
 			break;
-		case 'I':
-			showinput = 1;
-			break;
 		case 'i':
 			iname = optarg;
+			/* fall through */
+		case 'I':
+			showinput = 1;
 			break;
 		}
 	}
