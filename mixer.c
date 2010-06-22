@@ -19,6 +19,7 @@ struct channel {
 	char *name;
 	snd_mixer_elem_t *elem;
 	snd_mixer_selem_id_t *sid;
+	int playback;
 };
 
 GtkStatusIcon *icon;
@@ -32,8 +33,11 @@ static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
 static void update_gui(struct channel *c);
 
 
-static void get_element(struct channel *c)
+static void get_element(char *name, int playback, struct channel *c)
 {
+	c->name = name;
+	c->playback = playback;
+
 	snd_mixer_selem_id_alloca(&c->sid);
 	snd_mixer_selem_id_set_name(c->sid, c->name);
 	c->elem = snd_mixer_find_selem(mixer, c->sid);
@@ -41,7 +45,11 @@ static void get_element(struct channel *c)
 		fprintf(stderr, "can't find %s element\n", c->name);
 		exit(1);
 	}
-	snd_mixer_selem_set_playback_volume_range(c->elem, 0, 100);
+
+	if (c->playback)
+		snd_mixer_selem_set_playback_volume_range(c->elem, 0, 100);
+	else
+		snd_mixer_selem_set_capture_volume_range(c->elem, 0, 100);
 }
 
 static int mixer_init(char *name, char *iname)
@@ -57,11 +65,8 @@ static int mixer_init(char *name, char *iname)
 	snd_mixer_selem_register(mixer, NULL, NULL);
 	snd_mixer_load(mixer);
 
-	ch[0].name = name;
-	get_element(&ch[0]);
-
-	ch[1].name = iname;
-	get_element(&ch[1]);
+	get_element(name, 1, &ch[0]);
+	get_element(iname, 0, &ch[1]);
 	
 	n = snd_mixer_poll_descriptors_count(mixer);
 	fds = calloc(n, sizeof(struct pollfd));
@@ -75,31 +80,71 @@ static int mixer_init(char *name, char *iname)
 	return 0;
 }
 
+/*** wrappers for mixer api calls ***/
+
+static void _get_volume(snd_mixer_elem_t *elem, int playback, int n, long *val)
+{
+	if (playback)
+		snd_mixer_selem_get_playback_volume(elem, n, val);
+	else
+		snd_mixer_selem_get_capture_volume(elem, n, val);
+}
+
+static void _set_volume(snd_mixer_elem_t *elem, int playback, int n, long val)
+{
+	if (playback)
+		snd_mixer_selem_set_playback_volume(elem, n, val);
+	else
+		snd_mixer_selem_set_capture_volume(elem, n, val);
+}
+
+static void _get_switch(snd_mixer_elem_t *elem, int playback, int n, int *val)
+{
+	if (playback)
+		snd_mixer_selem_get_playback_switch(elem, n, val);
+	else
+		snd_mixer_selem_get_capture_switch(elem, n, val);
+}
+
+static void _set_switch(snd_mixer_elem_t *elem, int playback, int n, int val)
+{
+	if (playback)
+		snd_mixer_selem_set_playback_switch(elem, n, val);
+	else
+		snd_mixer_selem_set_capture_switch(elem, n, val);
+}
+
+static int _has_switch(snd_mixer_elem_t *elem, int playback)
+{
+	return playback ?
+		snd_mixer_selem_has_playback_switch(elem) :
+		snd_mixer_selem_has_capture_switch(elem);
+}
+
+/*** end of wrappers for mixer api calls ***/
+
+
 static int mixer_get(struct channel *c)
 {
 	long l, r;
 
-	snd_mixer_selem_get_playback_volume(c->elem,
-				SND_MIXER_SCHN_FRONT_LEFT, &l);
-	snd_mixer_selem_get_playback_volume(c->elem,
-				SND_MIXER_SCHN_FRONT_RIGHT, &r);
+	_get_volume(c->elem, c->playback, SND_MIXER_SCHN_FRONT_LEFT, &l);
+	_get_volume(c->elem, c->playback, SND_MIXER_SCHN_FRONT_RIGHT, &r);
 
 	return (l + r) / 2;
 }
 
 static void mixer_set(struct channel *c, int vol)
 {
-	snd_mixer_selem_set_playback_volume(c->elem,
-				SND_MIXER_SCHN_FRONT_LEFT, vol);
-	snd_mixer_selem_set_playback_volume(c->elem,
-				SND_MIXER_SCHN_FRONT_RIGHT, vol);
+	_set_volume(c->elem, c->playback, SND_MIXER_SCHN_FRONT_LEFT, vol);
+	_set_volume(c->elem, c->playback, SND_MIXER_SCHN_FRONT_RIGHT, vol);
 }
 
 static void mixer_getmute(struct channel *c)
 {
 	if (c->mute) {
-		snd_mixer_selem_get_playback_switch(c->elem,
-				SND_MIXER_SCHN_FRONT_LEFT, &c->muteval);
+		_get_switch(c->elem, c->playback, SND_MIXER_SCHN_FRONT_LEFT,
+								&c->muteval);
 	} else {
 		c->muteval = 1;
 	}
@@ -145,7 +190,10 @@ static void update_icon(struct channel *c)
 static void update_gui(struct channel *c)
 {
 	mixer_getmute(c);
-	update_icon(c);
+
+	/* Icon shows only playback mute status */
+	if (c->playback)
+		update_icon(c);
 
 	if (c->mute) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c->mute),
@@ -168,7 +216,7 @@ static void mute(GtkWidget *widget, struct channel *c)
 
 	val = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 	for (i = 0; i <= SND_MIXER_SCHN_LAST; i++)
-		snd_mixer_selem_set_playback_switch(c->elem, i, !val);
+		_set_switch(c->elem, c->playback, i, !val);
 
 	mixer_getmute(c);
 	update_icon(c);
@@ -212,8 +260,8 @@ static void quit()
 static void add_channel(struct channel *c)
 {
 	c->vbox = gtk_vbox_new(FALSE, 5);
-	c->vscale = gtk_vscale_new(GTK_ADJUSTMENT(
-		gtk_adjustment_new(mixer_get(c), 0, 100, 0, 0, 0)));
+	c->vscale = gtk_vscale_new(GTK_ADJUSTMENT(gtk_adjustment_new(
+					mixer_get(c), 0, 100, 0, 0, 0)));
 	gtk_scale_set_draw_value(GTK_SCALE(c->vscale), FALSE);
 	gtk_range_set_inverted(GTK_RANGE(c->vscale), TRUE);
 	gtk_container_add(GTK_CONTAINER(hbox), c->vbox);
@@ -224,7 +272,7 @@ static void add_channel(struct channel *c)
 	g_signal_connect(c->vscale,
 			"scroll-event", G_CALLBACK(scale_scroll), c);
 
-	if (snd_mixer_selem_has_playback_switch(c->elem)) {
+	if (_has_switch(c->elem, c->playback)) {
 		c->mute = gtk_check_button_new_with_label("Mute");
 		g_signal_connect((gpointer)c->mute,
 				"toggled", G_CALLBACK(mute), c);
@@ -238,7 +286,7 @@ int main(int argc, char **argv)
 {
 	int o;
 	char *name = "Master";
-	char *iname = "Front Mic";
+	char *iname = "Capture";
 	int showinput = 0;
 
 	bindtextdomain("tray_mixer", LOCALE_DIR);
