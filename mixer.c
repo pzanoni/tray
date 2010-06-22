@@ -292,15 +292,15 @@ int main(int argc, char **argv)
 	bindtextdomain("tray_mixer", LOCALE_DIR);
 	textdomain("tray_mixer");
 
-	while ((o = getopt(argc, argv, "e:iI:")) >= 0) {
+	while ((o = getopt(argc, argv, "e:Ii:")) >= 0) {
 		switch (o) {
 		case 'e':
 			name = optarg;
 			break;
-		case 'i':
+		case 'I':
 			showinput = 1;
 			break;
-		case 'I':
+		case 'i':
 			iname = optarg;
 			break;
 		}
