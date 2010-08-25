@@ -185,17 +185,15 @@ static gboolean on_mixer_event(GIOChannel* channel, GIOCondition cond, void *ud)
 
 static void update_icon(struct channel *c)
 {
-        gtk_status_icon_set_from_file(icon, c->muteval ?
-			ICON_PATH "speaker.png" : ICON_PATH "mute.png");
+	if (c->playback)
+		gtk_status_icon_set_from_file(icon, c->muteval ?
+				ICON_PATH "speaker.png" : ICON_PATH "mute.png");
 }
 
 static void update_gui(struct channel *c)
 {
 	mixer_getmute(c);
-
-	/* Icon shows only playback mute status */
-	if (c->playback)
-		update_icon(c);
+	update_icon(c);
 
 	if (c->mute) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(c->mute),
