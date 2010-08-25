@@ -1,6 +1,7 @@
 *.swp
 *.o
 core
+tray_buttons
 tray_eject
 tray_keyleds
 tray_mixer
