@@ -15,13 +15,15 @@ GtkWidget *button2;
 GtkWidget *button3;
 GtkWidget *button4;
 GtkWidget *button5;
+GtkWidget *button6;
 GtkWidget *vbox;
-GtkWidget *hbox1, *hbox2;
+GtkWidget *hbox1, *hbox2, *hbox3;
 GtkWidget *menu, *item;
-int susp = 1, direct = 0, screensaver = 0;
+int susp = 1, direct = 0, screensaver = 0, logout = 0;
 
 enum {
 	OPT_REBOOT,
+	OPT_LOGOUT,
 	OPT_SHUTDOWN,
 	OPT_SUSPEND,
 	OPT_HIBERNATE,
@@ -35,6 +37,9 @@ static void option(GtkButton *button, int n)
 	switch (n) {
 	case OPT_REBOOT:
 		system("reboot");
+		break;
+	case OPT_LOGOUT:
+		system("killall minilauncher");
 		break;
 	case OPT_SHUTDOWN:
 		system("halt");
@@ -111,8 +116,11 @@ int main(int argc, char **argv)
 	bindtextdomain("tray_reboot", LOCALE_DIR);
 	textdomain("tray_reboot");
 
-	while ((o = getopt(argc, argv, "Ssd")) >= 0) {
+	while ((o = getopt(argc, argv, "lSsd")) >= 0) {
 		switch (o) {
+		case 'l':
+			logout = 1;
+			break;
 		case 'S':
 			screensaver = 1;
 			break;
@@ -158,14 +166,18 @@ int main(int argc, char **argv)
 	vbox = gtk_vbox_new(TRUE, TRUE);
 	hbox1 = gtk_hbox_new(TRUE, TRUE);
 	hbox2 = gtk_hbox_new(TRUE, TRUE);
+	hbox3 = gtk_hbox_new(TRUE, TRUE);
 	g_signal_connect(G_OBJECT(window), "key-press-event",
 						G_CALLBACK(keypress), NULL);
 
 	set_button(&button1, N_("Reboot"), OPT_REBOOT, ICON_PATH "reboot.png");
+
 	set_button(&button2, N_("Turn off"), OPT_SHUTDOWN, ICON_PATH "shutdown.png");
 	set_button(&button3, N_("Suspend"), OPT_SUSPEND, ICON_PATH "suspend.png");
 	set_button(&button4, N_("Hibernate"), OPT_HIBERNATE, ICON_PATH "hibernate.png");
 	set_button(&button5, N_("Cancel"), OPT_CANCEL, ICON_PATH "cancel.png");
+
+	set_button(&button6, N_("Logout"), OPT_LOGOUT, ICON_PATH "logout.png");
 
 	settings = gtk_settings_get_default();
 	g_object_set (settings, "gtk-button-images", TRUE, NULL);
@@ -181,7 +193,14 @@ int main(int argc, char **argv)
 		gtk_container_add(GTK_CONTAINER(hbox2), button4);
 	}
 
-	gtk_container_add(GTK_CONTAINER(vbox), button5);
+	if (logout) {
+		gtk_container_add(GTK_CONTAINER(vbox), hbox3);
+		gtk_container_add(GTK_CONTAINER(hbox3), button6);
+		gtk_container_add(GTK_CONTAINER(hbox3), button5);
+	} else {
+		gtk_container_add(GTK_CONTAINER(vbox), button5);
+	}
+
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
 	gtk_window_set_title(GTK_WINDOW(window), N_("Quit session"));
