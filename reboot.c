@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 
 	if (!direct) {
 		icon1 = (struct GtkStatusIcon *)
-			gtk_status_icon_new_from_file(ICON_PATH "key.png");
+			gtk_status_icon_new_from_file(ICON_PATH "exit.png");
 		g_signal_connect(G_OBJECT(icon1), "activate",
 						G_CALLBACK(click), NULL);
 
