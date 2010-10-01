@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl_PL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:34-0200\n"
+"POT-Creation-Date: 2010-10-01 15:29-0300\n"
 "PO-Revision-Date: 2009-01-08 16:53-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-doc@lists.kde.org>\n"
@@ -16,11 +16,14 @@ msgstr ""
 "X-Generator: Lokalize 0.2\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: mixer.c:188
-msgid "Quit"
-msgstr "Zamknij"
-
-#: mixer.c:223
+#: mixer.c:277
 msgid "Mute"
 msgstr "Mute"
 
+#: mixer.c:277
+msgid "Capture"
+msgstr ""
+
+#: mixer.c:317
+msgid "Quit"
+msgstr "Zamknij"

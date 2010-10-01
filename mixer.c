@@ -274,7 +274,7 @@ static void add_channel(struct channel *c)
 
 	if (_has_switch(c->elem, c->playback)) {
 		c->mute = gtk_check_button_new_with_label(
-				c->playback ? "Mute" : "Capture");
+				c->playback ? _("Mute") : _("Capture"));
 		g_signal_connect((gpointer)c->mute,
 				"toggled", G_CALLBACK(mute), c);
 		gtk_box_pack_end(GTK_BOX(c->vbox), c->mute, FALSE, FALSE, 0);
