@@ -17,7 +17,7 @@ U_BINS = tray_buttons
 S_BINS	= vold
 BINS	= $(U_BINS) $(T_BINS) $(S_BINS)
 INSTS	= $(BINS:=-install)
-LANGS	= pt_BR fr_FR de_DE es_ES it_IT nl_NL pl_PL pt_PT.po zh_CN
+LANGS	= pt_BR fr_FR de_DE es_ES it_IT nl_NL pl_PL pt_PT zh_CN
 
 
 .c.o:
