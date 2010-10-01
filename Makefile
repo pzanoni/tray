@@ -18,6 +18,7 @@ S_BINS	= vold
 BINS	= $(U_BINS) $(T_BINS) $(S_BINS)
 INSTS	= $(BINS:=-install)
 LANGS	= pt_BR fr_FR de_DE es_ES it_IT nl_NL pl_PL pt_PT zh_CN
+INTL_PROGS = eject keyleds mixer randr reboot
 
 
 .c.o:
@@ -29,6 +30,15 @@ LANGS	= pt_BR fr_FR de_DE es_ES it_IT nl_NL pl_PL pt_PT zh_CN
 all: $(BINS)
 
 install: locale $(INSTS)
+
+update-po:
+	@for prog in $(INTL_PROGS); do \
+		xgettext -k_ $$prog.c -o intl/tray_$$prog/$$prog.pot; \
+		for lang in $(LANGS); do \
+			msgmerge -U --backup=off intl/tray_$$prog/$$lang.po \
+				 intl/tray_$$prog/$$prog.pot; \
+		done \
+	done
 
 locale:
 	@for i in $(T_BINS); do \
