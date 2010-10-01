@@ -7,4 +7,6 @@ tray_keyleds
 tray_mixer
 tray_randr
 tray_reboot
+# Don't ignore intl/tray_buttons and others
+!intl/*
 vold
