@@ -79,7 +79,7 @@ vold: volume.o
 applet-install:
 	$(INSTALL) -m755 -d $(DESTDIR)$(ICONDIR)/$(APPLET)
 	$(INSTALL) -m644 icons/$(APPLET)/*.png $(DESTDIR)$(ICONDIR)/$(APPLET)
-	$(INSTALL) -m755 -s $(APPLET) $(DESTDIR)$(BINDIR)
+	$(INSTALL) -m755 -s -D $(APPLET) $(DESTDIR)$(BINDIR)/$(APPLET)
 	for i in $(LANGS); do \
 		if test -f intl/$(APPLET)/$$i.mo; then \
 			$(INSTALL) -m644 -D intl/$(APPLET)/$$i.mo \
