@@ -26,7 +26,7 @@ msgstr "Mudar par o ecrã do portátil"
 
 #: randr.c:77
 msgid "Use both displays"
-msgstr ""
+msgstr "Utilizar ambos os ecrãs"
 
 #: randr.c:83
 msgid "Set ext. resolution to 1024x768"

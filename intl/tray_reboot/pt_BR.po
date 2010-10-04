@@ -42,7 +42,7 @@ msgstr "Cancelar"
 
 #: reboot.c:180
 msgid "Logout"
-msgstr ""
+msgstr "Sair"
 
 #: reboot.c:206
 msgid "Quit session"

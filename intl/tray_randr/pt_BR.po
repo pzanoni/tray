@@ -26,11 +26,11 @@ msgstr "Alternar para display interno"
 
 #: randr.c:77
 msgid "Use both displays"
-msgstr ""
+msgstr "Utilizar ambos os displays"
 
 #: randr.c:83
 msgid "Set ext. resolution to 1024x768"
-msgstr ""
+msgstr "Alternar resolução externa para 1024x768"
 
 #: randr.c:84
 msgid "Set ext. resolution to 800x600"

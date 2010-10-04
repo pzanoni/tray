@@ -22,7 +22,7 @@ msgstr "Sem Som"
 
 #: mixer.c:277
 msgid "Capture"
-msgstr ""
+msgstr "Captura"
 
 #: mixer.c:317
 msgid "Quit"
