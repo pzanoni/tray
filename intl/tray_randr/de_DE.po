@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de_DE\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:35-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: 2009-01-09 10:47-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team:  <en@li.org>\n"
@@ -17,41 +17,43 @@ msgstr ""
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: randr.c:78
+#: randr.c:75
 msgid "Switch to external display"
 msgstr "Zum externen Bildschirm umschalten"
 
-#: randr.c:79
+#: randr.c:76
 msgid "Switch to built-in display"
 msgstr "Zum internen Bildschirm umschalten"
 
-#: randr.c:80
-msgid "Copy the flatpanel on the external screen"
-msgstr "Den Arbeitsplatz auf einen externen Bildschirm kopieren"
-
-#: randr.c:81
-msgid "Use external screen to extend the panel on the left"
-msgstr "Mit dem externen Bildschirm den Arbeitsplatz auf der linken Seite erweitern"
-
-#: randr.c:82
-msgid "Use external screen to extend the panel on the right"
+#: randr.c:77
+msgid "Use both displays"
 msgstr ""
-"Mit dem externen Bildschirm den Arbeitsplatz auf der rechten Seite "
-"erweitern"
 
-#: randr.c:88
+#: randr.c:83
 msgid "Set ext. resolution to 1024x768"
 msgstr "Auflösung des ext. Bildschirms ändern auf 1024x768"
 
-#: randr.c:89
+#: randr.c:84
 msgid "Set ext. resolution to 800x600"
 msgstr "Auflösung des ext. Bildschirms ändern auf 800x600"
 
-#: randr.c:90
+#: randr.c:85
 msgid "Set ext. resolution to 640x480"
 msgstr "Auflösung des ext. Bildschirms ändern auf 640x480"
 
-#: randr.c:99
+#: randr.c:94
 msgid "Quit"
 msgstr "Beenden"
 
+#~ msgid "Copy the flatpanel on the external screen"
+#~ msgstr "Den Arbeitsplatz auf einen externen Bildschirm kopieren"
+
+#~ msgid "Use external screen to extend the panel on the left"
+#~ msgstr ""
+#~ "Mit dem externen Bildschirm den Arbeitsplatz auf der linken Seite "
+#~ "erweitern"
+
+#~ msgid "Use external screen to extend the panel on the right"
+#~ msgstr ""
+#~ "Mit dem externen Bildschirm den Arbeitsplatz auf der rechten Seite "
+#~ "erweitern"

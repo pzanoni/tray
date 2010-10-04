@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_BR\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:35-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: 2008-12-08 12:59-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: brazilian portuguese <en@li.org>\n"
@@ -16,39 +16,39 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: randr.c:78
+#: randr.c:75
 msgid "Switch to external display"
 msgstr "Alternar para display externo"
 
-#: randr.c:79
+#: randr.c:76
 msgid "Switch to built-in display"
 msgstr "Alternar para display interno"
 
-#: randr.c:80
-msgid "Copy the flatpanel on the external screen"
-msgstr "Copiar a tela para o monitor externo"
+#: randr.c:77
+msgid "Use both displays"
+msgstr ""
 
-#: randr.c:81
-msgid "Use external screen to extend the panel on the left"
-msgstr "Usar monitor externo para extender o painel à esquerda"
-
-#: randr.c:82
-msgid "Use external screen to extend the panel on the right"
-msgstr "Usar o monitor externo para extender o painel à direita"
-
-#: randr.c:88
+#: randr.c:83
 msgid "Set ext. resolution to 1024x768"
 msgstr ""
 
-#: randr.c:89
+#: randr.c:84
 msgid "Set ext. resolution to 800x600"
 msgstr "Alternar resolução externa para 800x600"
 
-#: randr.c:90
+#: randr.c:85
 msgid "Set ext. resolution to 640x480"
 msgstr "Alternar resolução externa para 640x480"
 
-#: randr.c:99
+#: randr.c:94
 msgid "Quit"
 msgstr "Sair"
 
+#~ msgid "Copy the flatpanel on the external screen"
+#~ msgstr "Copiar a tela para o monitor externo"
+
+#~ msgid "Use external screen to extend the panel on the left"
+#~ msgstr "Usar monitor externo para extender o painel à esquerda"
+
+#~ msgid "Use external screen to extend the panel on the right"
+#~ msgstr "Usar o monitor externo para extender o painel à direita"

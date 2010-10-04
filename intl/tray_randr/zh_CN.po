@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zn_CH\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:35-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: 2009-01-08 17:12-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-doc@lists.kde.org>\n"
@@ -16,39 +16,39 @@ msgstr ""
 "X-Generator: Lokalize 0.2\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: randr.c:78
+#: randr.c:75
 msgid "Switch to external display"
 msgstr "切换到外部显示器"
 
-#: randr.c:79
+#: randr.c:76
 msgid "Switch to built-in display"
 msgstr "切换到内置显示器"
 
-#: randr.c:80
-msgid "Copy the flatpanel on the external screen"
-msgstr "同时在外部显示器上显示桌面"
+#: randr.c:77
+msgid "Use both displays"
+msgstr ""
 
-#: randr.c:81
-msgid "Use external screen to extend the panel on the left"
-msgstr "用外部屏幕扩展桌面的左边"
-
-#: randr.c:82
-msgid "Use external screen to extend the panel on the right"
-msgstr "用外部屏幕扩展桌面的右边"
-
-#: randr.c:88
+#: randr.c:83
 msgid "Set ext. resolution to 1024x768"
 msgstr "设置外部分辨率为1024x768"
 
-#: randr.c:89
+#: randr.c:84
 msgid "Set ext. resolution to 800x600"
 msgstr "设置外部分辨率为800x600"
 
-#: randr.c:90
+#: randr.c:85
 msgid "Set ext. resolution to 640x480"
 msgstr "设置外部分辨率为640x480"
 
-#: randr.c:99
+#: randr.c:94
 msgid "Quit"
 msgstr "退出"
 
+#~ msgid "Copy the flatpanel on the external screen"
+#~ msgstr "同时在外部显示器上显示桌面"
+
+#~ msgid "Use external screen to extend the panel on the left"
+#~ msgstr "用外部屏幕扩展桌面的左边"
+
+#~ msgid "Use external screen to extend the panel on the right"
+#~ msgstr "用外部屏幕扩展桌面的右边"

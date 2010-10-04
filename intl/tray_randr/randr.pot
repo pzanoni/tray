@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:35-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,38 +16,30 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: randr.c:78
+#: randr.c:75
 msgid "Switch to external display"
 msgstr ""
 
-#: randr.c:79
+#: randr.c:76
 msgid "Switch to built-in display"
 msgstr ""
 
-#: randr.c:80
-msgid "Copy the flatpanel on the external screen"
+#: randr.c:77
+msgid "Use both displays"
 msgstr ""
 
-#: randr.c:81
-msgid "Use external screen to extend the panel on the left"
-msgstr ""
-
-#: randr.c:82
-msgid "Use external screen to extend the panel on the right"
-msgstr ""
-
-#: randr.c:88
+#: randr.c:83
 msgid "Set ext. resolution to 1024x768"
 msgstr ""
 
-#: randr.c:89
+#: randr.c:84
 msgid "Set ext. resolution to 800x600"
 msgstr ""
 
-#: randr.c:90
+#: randr.c:85
 msgid "Set ext. resolution to 640x480"
 msgstr ""
 
-#: randr.c:99
+#: randr.c:94
 msgid "Quit"
 msgstr ""

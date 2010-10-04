@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_PT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:35-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: 2009-01-08 17:06-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-doc@lists.kde.org>\n"
@@ -16,42 +16,41 @@ msgstr ""
 "X-Generator: Lokalize 0.2\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: randr.c:78
+#: randr.c:75
 msgid "Switch to external display"
 msgstr "Mudar par um monitor externo"
 
-#: randr.c:79
+#: randr.c:76
 msgid "Switch to built-in display"
 msgstr "Mudar par o ecrã do portátil"
 
-#: randr.c:80
-msgid "Copy the flatpanel on the external screen"
-msgstr "Copiar o ambiente de trabalho para o monitor externo"
-
-#: randr.c:81
-msgid "Use external screen to extend the panel on the left"
+#: randr.c:77
+msgid "Use both displays"
 msgstr ""
-"Usar o monitor externo para esticar o ambiente de trabalho para "
-"esquerda"
 
-#: randr.c:82
-msgid "Use external screen to extend the panel on the right"
-msgstr ""
-"Usar o monitor externo para esticar o ambiente de trabalho para direita"
-
-#: randr.c:88
+#: randr.c:83
 msgid "Set ext. resolution to 1024x768"
 msgstr "Escolher resolução ex. 1024x768"
 
-#: randr.c:89
+#: randr.c:84
 msgid "Set ext. resolution to 800x600"
 msgstr "Escolher resolução ex. 800x600"
 
-#: randr.c:90
+#: randr.c:85
 msgid "Set ext. resolution to 640x480"
 msgstr "Escolher resolução ex. 640x480"
 
-#: randr.c:99
+#: randr.c:94
 msgid "Quit"
 msgstr "Sair"
 
+#~ msgid "Copy the flatpanel on the external screen"
+#~ msgstr "Copiar o ambiente de trabalho para o monitor externo"
+
+#~ msgid "Use external screen to extend the panel on the left"
+#~ msgstr ""
+#~ "Usar o monitor externo para esticar o ambiente de trabalho para esquerda"
+
+#~ msgid "Use external screen to extend the panel on the right"
+#~ msgstr ""
+#~ "Usar o monitor externo para esticar o ambiente de trabalho para direita"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zh_CN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:33-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: 2009-01-08 16:22-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-doc@lists.kde.org>\n"
@@ -16,19 +16,19 @@ msgstr ""
 "X-Generator: Lokalize 0.2\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: eject.c:141
+#: eject.c:149
 msgid "Safely remove"
 msgstr "安全移除"
 
-#: eject.c:148
+#: eject.c:156
 msgid "Access content on"
 msgstr "访问设备上的内容："
 
-#: eject.c:289
+#: eject.c:298
 msgid "Safely remove all"
 msgstr "安全移除所有设备"
 
-#: eject.c:309
+#: eject.c:318
 msgid ""
 "Unable to unmount this device. Some\n"
 "application is likely to be using it.\n"
@@ -39,4 +39,3 @@ msgstr ""
 "有程序正在使用该设备。\n"
 "请关闭所有正在使用的程序\n"
 "并重试。"
-

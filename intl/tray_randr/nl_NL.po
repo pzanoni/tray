@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nl_NL\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:35-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: 2009-01-08 16:57-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-doc@lists.kde.org>\n"
@@ -16,41 +16,41 @@ msgstr ""
 "X-Generator: Lokalize 0.2\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: randr.c:78
+#: randr.c:75
 msgid "Switch to external display"
 msgstr "Overschakelen op extern scherm"
 
-#: randr.c:79
+#: randr.c:76
 msgid "Switch to built-in display"
 msgstr "Overschakelen op ingebouwd scherm"
 
-#: randr.c:80
-msgid "Copy the flatpanel on the external screen"
-msgstr "Kopieer flatpanel op het externe scherm"
-
-#: randr.c:81
-msgid "Use external screen to extend the panel on the left"
+#: randr.c:77
+msgid "Use both displays"
 msgstr ""
-"Gebruik extern scherm om het scherm aan de linkerkant uit te breiden"
 
-#: randr.c:82
-msgid "Use external screen to extend the panel on the right"
-msgstr ""
-"Gebruik extern scherm om het scherm aan de rechterkant uit te breiden"
-
-#: randr.c:88
+#: randr.c:83
 msgid "Set ext. resolution to 1024x768"
 msgstr "Resolutie instellen op 1024 x 768"
 
-#: randr.c:89
+#: randr.c:84
 msgid "Set ext. resolution to 800x600"
 msgstr "Resolutie instellen op 800 x 600"
 
-#: randr.c:90
+#: randr.c:85
 msgid "Set ext. resolution to 640x480"
 msgstr "Resolutie instellen op 640 x 480"
 
-#: randr.c:99
+#: randr.c:94
 msgid "Quit"
 msgstr "Afsluiten"
 
+#~ msgid "Copy the flatpanel on the external screen"
+#~ msgstr "Kopieer flatpanel op het externe scherm"
+
+#~ msgid "Use external screen to extend the panel on the left"
+#~ msgstr ""
+#~ "Gebruik extern scherm om het scherm aan de linkerkant uit te breiden"
+
+#~ msgid "Use external screen to extend the panel on the right"
+#~ msgstr ""
+#~ "Gebruik extern scherm om het scherm aan de rechterkant uit te breiden"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es_ES\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 17:35-0200\n"
+"POT-Creation-Date: 2010-10-04 16:44-0300\n"
 "PO-Revision-Date: 2009-01-08 17:07-0200\n"
 "Last-Translator: Ednilson Miura <miura@mandriva.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-doc@lists.kde.org>\n"
@@ -16,43 +16,42 @@ msgstr ""
 "X-Generator: Lokalize 0.2\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: randr.c:78
+#: randr.c:75
 msgid "Switch to external display"
 msgstr "Cambiar a pantalla externa"
 
-#: randr.c:79
+#: randr.c:76
 msgid "Switch to built-in display"
 msgstr "Cambiar a pantalla normal"
 
-#: randr.c:80
-msgid "Copy the flatpanel on the external screen"
-msgstr "Copiar la pantalla normal en la pantalla externa"
-
-#: randr.c:81
-msgid "Use external screen to extend the panel on the left"
+#: randr.c:77
+msgid "Use both displays"
 msgstr ""
-"Usar la pantalla externa para extender la pantalla normal hacia la "
-"izquierda"
 
-#: randr.c:82
-msgid "Use external screen to extend the panel on the right"
-msgstr ""
-"Usar la pantalla externa para extender la pantalla normal hacia la "
-"derecha"
-
-#: randr.c:88
+#: randr.c:83
 msgid "Set ext. resolution to 1024x768"
 msgstr "Elegir una resolución externa de 1024x768"
 
-#: randr.c:89
+#: randr.c:84
 msgid "Set ext. resolution to 800x600"
 msgstr "Elegir una resolución externa de 800x600"
 
-#: randr.c:90
+#: randr.c:85
 msgid "Set ext. resolution to 640x480"
 msgstr "Elegir una resolución externa de 640x480"
 
-#: randr.c:99
+#: randr.c:94
 msgid "Quit"
 msgstr "Salir"
 
+#~ msgid "Copy the flatpanel on the external screen"
+#~ msgstr "Copiar la pantalla normal en la pantalla externa"
+
+#~ msgid "Use external screen to extend the panel on the left"
+#~ msgstr ""
+#~ "Usar la pantalla externa para extender la pantalla normal hacia la "
+#~ "izquierda"
+
+#~ msgid "Use external screen to extend the panel on the right"
+#~ msgstr ""
+#~ "Usar la pantalla externa para extender la pantalla normal hacia la derecha"
