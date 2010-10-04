@@ -1,7 +1,8 @@
 
-BINDIR	= /usr/bin
-ICONDIR	= /usr/share/icons
-LOCALEDIR = /usr/share/locale
+PREFIX    = /usr
+BINDIR    = $(PREFIX)/bin
+ICONDIR   = $(PREFIX)/share/icons
+LOCALEDIR = $(PREFIX)/share/locale
 
 
 CC	= gcc -g
