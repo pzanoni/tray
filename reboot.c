@@ -170,14 +170,14 @@ int main(int argc, char **argv)
 	g_signal_connect(G_OBJECT(window), "key-press-event",
 						G_CALLBACK(keypress), NULL);
 
-	set_button(&button1, N_("Reboot"), OPT_REBOOT, ICON_PATH "reboot.png");
+	set_button(&button1, _("Reboot"), OPT_REBOOT, ICON_PATH "reboot.png");
 
-	set_button(&button2, N_("Turn off"), OPT_SHUTDOWN, ICON_PATH "shutdown.png");
-	set_button(&button3, N_("Suspend"), OPT_SUSPEND, ICON_PATH "suspend.png");
-	set_button(&button4, N_("Hibernate"), OPT_HIBERNATE, ICON_PATH "hibernate.png");
-	set_button(&button5, N_("Cancel"), OPT_CANCEL, ICON_PATH "cancel.png");
+	set_button(&button2, _("Turn off"), OPT_SHUTDOWN, ICON_PATH "shutdown.png");
+	set_button(&button3, _("Suspend"), OPT_SUSPEND, ICON_PATH "suspend.png");
+	set_button(&button4, _("Hibernate"), OPT_HIBERNATE, ICON_PATH "hibernate.png");
+	set_button(&button5, _("Cancel"), OPT_CANCEL, ICON_PATH "cancel.png");
 
-	set_button(&button6, N_("Logout"), OPT_LOGOUT, ICON_PATH "logout.png");
+	set_button(&button6, _("Logout"), OPT_LOGOUT, ICON_PATH "logout.png");
 
 	settings = gtk_settings_get_default();
 	g_object_set (settings, "gtk-button-images", TRUE, NULL);
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
 
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
-	gtk_window_set_title(GTK_WINDOW(window), N_("Quit session"));
+	gtk_window_set_title(GTK_WINDOW(window), _("Quit session"));
 
 	GdkPixbuf *pixbuf;
 	pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/gnome/scalable/actions/gtk-quit.svg", NULL);
