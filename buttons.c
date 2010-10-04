@@ -146,7 +146,7 @@ int main(int argc, char **argv)
 		g_signal_connect(G_OBJECT(icon1), "activate",
 			G_CALLBACK(click), NULL);
 
-		item = gtk_menu_item_new_with_label(N_("Quit"));
+		item = gtk_menu_item_new_with_label(_("Quit"));
 		menu = gtk_menu_new();
 		gtk_widget_show(item);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 	}
 
 	gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
-	gtk_window_set_title(GTK_WINDOW(window), N_("Buttons"));
+	gtk_window_set_title(GTK_WINDOW(window), _("Buttons"));
 
 	if (direct) {
 		click();

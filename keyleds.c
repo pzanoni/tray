@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 	init_ind(&num, ICON_PATH "num0.png", ICON_PATH "num1.png", 77, 0x02);
 
 #ifdef POPUP_MENU
-	item = gtk_menu_item_new_with_label(N_("Quit"));
+	item = gtk_menu_item_new_with_label(_("Quit"));
 	menu = gtk_menu_new();
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
