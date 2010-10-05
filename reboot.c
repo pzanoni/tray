@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 	gtk_window_set_title(GTK_WINDOW(window), _("Quit session"));
 
 	GdkPixbuf *pixbuf;
-	pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/gnome/scalable/actions/gtk-quit.svg", NULL);
+	pixbuf = gdk_pixbuf_new_from_file(ICON_PATH "icon.svg", NULL);
 	gtk_window_set_icon(GTK_WINDOW(window), pixbuf);
 
 	if (direct) {
