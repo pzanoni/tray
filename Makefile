@@ -13,13 +13,12 @@ LDFLAGS	=
 LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
 INSTALL	= install
 MSGFMT	= msgfmt -vv
-T_BINS= tray_reboot tray_keyleds tray_mixer tray_eject tray_randr
-U_BINS = tray_buttons
+T_BINS = tray_buttons tray_eject tray_keyleds tray_mixer tray_randr tray_reboot
 S_BINS	= vold
-BINS	= $(U_BINS) $(T_BINS) $(S_BINS)
+BINS	= $(T_BINS) $(S_BINS)
 INSTS	= $(BINS:=-install)
 LANGS	= pt_BR fr_FR de_DE es_ES it_IT nl_NL pl_PL pt_PT zh_CN
-INTL_PROGS = eject keyleds mixer randr reboot
+INTL_PROGS = buttons eject keyleds mixer randr reboot
 
 
 .c.o:
