@@ -15,4 +15,8 @@
 #define LOCALE_DIR "/usr/share/locale"
 #endif
 
+#ifndef SBIN_DIR
+#define SBIN_DIR "/usr/sbin"
+#endif
+
 #endif

@@ -1,13 +1,15 @@
 
 PREFIX    = /usr
 BINDIR    = $(PREFIX)/bin
+SBINDIR   = $(PREFIX)/sbin
 ICONDIR   = $(PREFIX)/share/icons
 LOCALEDIR = $(PREFIX)/share/locale
 
 
 CC	= gcc -g
 CFLAGS	= -Wall -O2 -DICON_DIR=\"$(ICONDIR)\" -DLOCALE_DIR=\"$(LOCALEDIR)\" \
-	  `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` 
+	  -DSBIN_DIR=\"$(SBINDIR)\" \
+	  `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0`
 LD	= gcc
 LDFLAGS	=
 LIBS	= `pkg-config --libs gtk+-2.0` `pkg-config --libs gdk-2.0`
@@ -29,7 +31,7 @@ INTL_PROGS = buttons eject keyleds mixer randr reboot
 
 all: $(BINS)
 
-install: locale $(INSTS)
+install: locale $(INSTS) logout-sh
 
 update-po:
 	@for prog in $(INTL_PROGS); do \
@@ -85,6 +87,9 @@ applet-install:
 			$(DESTDIR)$(LOCALEDIR)/$$i/LC_MESSAGES/$(APPLET).mo; \
 		fi \
 	done
+
+logout-sh:
+	$(INSTALL) -m755 -D logout.sh $(DESTDIR)$(SBINDIR)/logout.sh
 
 clean:
 	rm -f core *.o *~ intl/*/*.mo

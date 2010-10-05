@@ -45,7 +45,7 @@ static void option(GtkButton *button, gpointer data)
 		system("reboot");
 		break;
 	case OPT_LOGOUT:
-		system("/usr/sbin/logout.sh");
+		system(SBIN_DIR "/logout.sh");
 		break;
 	case OPT_SHUTDOWN:
 		system("halt");
