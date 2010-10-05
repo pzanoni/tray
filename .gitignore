@@ -1,5 +1,6 @@
 *.swp
 *.o
+*.mo
 core
 tray_buttons
 tray_eject
