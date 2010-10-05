@@ -15,11 +15,15 @@
 #define ICON_PATH ICON_DIR "/tray_buttons/"
 #define MAX_BUTTONS 16
 
+struct button_data {
+	GtkWidget *gtk_button;
+	char *command;
+};
+
+struct button_data buttons[MAX_BUTTONS];
 GtkWidget *window;
-GtkWidget *button[MAX_BUTTONS];
 GtkWidget *box;
 GtkWidget *menu, *item;
-char *command[MAX_BUTTONS];
 int num_buttons;
 int vertical;
 int direct;
@@ -28,11 +32,12 @@ char *config = "/etc/buttons.conf";
 int debug = 0;
 
 
-static void option(GtkButton *button, int n)
+static void option(GtkButton *button, gpointer data)
 {
-	//printf("button %d/%d, execute command: \"%s\"\n", n, num_buttons, command[n]);
-	if (n < num_buttons)
-		system(command[n]);
+	struct button_data *bdata = (struct button_data*)data;
+	//printf("button %d/%d, execute command: \"%s\"\n", n, num_buttons,
+	//       bdata->command);
+	system(bdata->command);
 }
 	 
 static void popup()
@@ -59,14 +64,16 @@ static void click()
 	}
 }
 
-static void set_button(GtkWidget **b, int p, char *i)
+static void set_button(struct button_data *bdata, char *i)
 {
-	*b = gtk_button_new();
-	g_signal_connect(G_OBJECT(*b), "clicked", G_CALLBACK(option),
-							(gpointer)(p));
-	gtk_button_set_image(GTK_BUTTON(*b), gtk_image_new_from_file(i));
-	gtk_button_set_image_position(GTK_BUTTON(*b), GTK_POS_TOP);
-	gtk_container_add(GTK_CONTAINER(box), *b);
+	bdata->gtk_button = gtk_button_new();
+	g_signal_connect(G_OBJECT(bdata->gtk_button), "clicked",
+			 G_CALLBACK(option), (gpointer)(bdata));
+	gtk_button_set_image(GTK_BUTTON(bdata->gtk_button),
+			     gtk_image_new_from_file(i));
+	gtk_button_set_image_position(GTK_BUTTON(bdata->gtk_button),
+				      GTK_POS_TOP);
+	gtk_container_add(GTK_CONTAINER(box), bdata->gtk_button);
 }
 
 #define LINE_SIZE 256
@@ -80,7 +87,7 @@ static int read_config(char *conf)
 	f = fopen(conf, "r");
 	if (f == NULL)
 		return -1;
-	
+
 	for (i = 0; i < MAX_BUTTONS; i++) {
 		char *cmd, *icon;
 
@@ -94,8 +101,8 @@ static int read_config(char *conf)
 		if (debug)
 			printf("cmd=\"%s\", icon=\"%s\"\n", cmd, icon);
 
-		command[i] = strdup(cmd);
-		set_button(&button[i], i, icon);
+		buttons[i].command = strdup(cmd);
+		set_button(&buttons[i], icon);
 	}
 
 	num_buttons = i;
