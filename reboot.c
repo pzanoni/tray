@@ -9,13 +9,18 @@
 
 #define ICON_PATH ICON_DIR "/tray_reboot/"
 
+struct button_data {
+	GtkWidget *gtk_button;
+	int option;
+};
+
 GtkWidget *window;
-GtkWidget *button1;
-GtkWidget *button2;
-GtkWidget *button3;
-GtkWidget *button4;
-GtkWidget *button5;
-GtkWidget *button6;
+struct button_data reboot_btn;
+struct button_data off_btn;
+struct button_data suspend_btn;
+struct button_data hibernate_btn;
+struct button_data cancel_btn;
+struct button_data logout_btn;
 GtkWidget *vbox;
 GtkWidget *hbox1, *hbox2, *hbox3;
 GtkWidget *menu, *item;
@@ -30,11 +35,12 @@ enum {
 	OPT_CANCEL
 };
 
-static void option(GtkButton *button, int n)
+static void option(GtkButton *button, gpointer data)
 {
+	struct button_data *bdata = (struct button_data *)data;
 	gtk_widget_hide_all(window);
 
-	switch (n) {
+	switch (bdata->option) {
 	case OPT_REBOOT:
 		system("reboot");
 		break;
@@ -58,7 +64,7 @@ static void option(GtkButton *button, int n)
 		break;
 	}
 }
-	 
+
 static void click()
 {
 	gtk_widget_show_all(window);
@@ -97,13 +103,16 @@ static void keypress(GtkWidget *widget, GdkEventKey *event, gpointer data)
 	}
 }
 
-static void set_button(GtkWidget **b, char *l, int p, char *i)
+static void set_button(struct button_data *bdata, char *l, int opt, char *i)
 {
-	*b = gtk_button_new_with_label(_(l));
-	g_signal_connect(G_OBJECT(*b), "clicked", G_CALLBACK(option),
-							(gpointer)(p));
-	gtk_button_set_image(GTK_BUTTON(*b), gtk_image_new_from_file(i));
-	gtk_button_set_image_position(GTK_BUTTON(*b), GTK_POS_TOP);
+	bdata->gtk_button = gtk_button_new_with_label(_(l));
+	bdata->option = opt;
+	g_signal_connect(G_OBJECT(bdata->gtk_button), "clicked",
+			 G_CALLBACK(option), (gpointer)(bdata));
+	gtk_button_set_image(GTK_BUTTON(bdata->gtk_button),
+			     gtk_image_new_from_file(i));
+	gtk_button_set_image_position(GTK_BUTTON(bdata->gtk_button),
+				      GTK_POS_TOP);
 }
 
 int main(int argc, char **argv)
@@ -170,35 +179,36 @@ int main(int argc, char **argv)
 	g_signal_connect(G_OBJECT(window), "key-press-event",
 						G_CALLBACK(keypress), NULL);
 
-	set_button(&button1, _("Reboot"), OPT_REBOOT, ICON_PATH "reboot.png");
 
-	set_button(&button2, _("Turn off"), OPT_SHUTDOWN, ICON_PATH "shutdown.png");
-	set_button(&button3, _("Suspend"), OPT_SUSPEND, ICON_PATH "suspend.png");
-	set_button(&button4, _("Hibernate"), OPT_HIBERNATE, ICON_PATH "hibernate.png");
-	set_button(&button5, _("Cancel"), OPT_CANCEL, ICON_PATH "cancel.png");
+	set_button(&reboot_btn, _("Reboot"), OPT_REBOOT, ICON_PATH "reboot.png");
 
-	set_button(&button6, _("Logout"), OPT_LOGOUT, ICON_PATH "logout.png");
+	set_button(&off_btn, _("Turn off"), OPT_SHUTDOWN, ICON_PATH "shutdown.png");
+	set_button(&suspend_btn, _("Suspend"), OPT_SUSPEND, ICON_PATH "suspend.png");
+	set_button(&hibernate_btn, _("Hibernate"), OPT_HIBERNATE, ICON_PATH "hibernate.png");
+	set_button(&cancel_btn, _("Cancel"), OPT_CANCEL, ICON_PATH "cancel.png");
+
+	set_button(&logout_btn, _("Logout"), OPT_LOGOUT, ICON_PATH "logout.png");
 
 	settings = gtk_settings_get_default();
 	g_object_set (settings, "gtk-button-images", TRUE, NULL);
 
 	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
-	gtk_container_add(GTK_CONTAINER(hbox1), button1);
-	gtk_container_add(GTK_CONTAINER(hbox1), button2);
+	gtk_container_add(GTK_CONTAINER(hbox1), reboot_btn.gtk_button);
+	gtk_container_add(GTK_CONTAINER(hbox1), off_btn.gtk_button);
 
 	if (susp) {
 		gtk_container_add(GTK_CONTAINER(vbox), hbox2);
-		gtk_container_add(GTK_CONTAINER(hbox2), button3);
-		gtk_container_add(GTK_CONTAINER(hbox2), button4);
+		gtk_container_add(GTK_CONTAINER(hbox2), suspend_btn.gtk_button);
+		gtk_container_add(GTK_CONTAINER(hbox2), hibernate_btn.gtk_button);
 	}
 
 	if (logout) {
 		gtk_container_add(GTK_CONTAINER(vbox), hbox3);
-		gtk_container_add(GTK_CONTAINER(hbox3), button6);
-		gtk_container_add(GTK_CONTAINER(hbox3), button5);
+		gtk_container_add(GTK_CONTAINER(hbox3), logout_btn.gtk_button);
+		gtk_container_add(GTK_CONTAINER(hbox3), cancel_btn.gtk_button);
 	} else {
-		gtk_container_add(GTK_CONTAINER(vbox), button5);
+		gtk_container_add(GTK_CONTAINER(vbox), cancel_btn.gtk_button);
 	}
 
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
