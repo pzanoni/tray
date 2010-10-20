@@ -89,7 +89,7 @@ applet-install:
 	done
 
 logout-sh:
-	$(INSTALL) -m755 -D logout.sh $(DESTDIR)$(SBINDIR)/logout.sh
+	$(INSTALL) -m755 -D tray_logout.sh $(DESTDIR)$(SBINDIR)/tray_logout.sh
 
 clean:
 	rm -f core *.o *~ intl/*/*.mo
