@@ -30,7 +30,40 @@ int direct;
 int center;
 char *config = "/etc/buttons.conf";
 int debug = 0;
+gboolean can_use_alpha = FALSE;
+double background_alpha = 1.0;
 
+static gboolean window_exposed(GtkWidget *widget, GdkEventExpose *event,
+			       gpointer data)
+{
+	cairo_t *cr = gdk_cairo_create(widget->window);
+
+	if (can_use_alpha)
+	    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, background_alpha);
+	else
+	    cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+
+	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+	cairo_paint(cr);
+	cairo_destroy(cr);
+	return FALSE;
+}
+
+static void screen_changed(GtkWidget *widget, GdkScreen *old_screen,
+			   gpointer data)
+{
+	GdkScreen *screen = gtk_widget_get_screen(widget);
+	GdkColormap *colormap = gdk_screen_get_rgba_colormap(screen);
+
+	if (!colormap) {
+	    fprintf(stderr, "Your screen does not support alpha.\n");
+	    colormap = gdk_screen_get_rgb_colormap(screen);
+	    can_use_alpha = FALSE;
+	} else {
+	    can_use_alpha = TRUE;
+	}
+	gtk_widget_set_colormap(widget, colormap);
+}
 
 static void option(GtkButton *button, gpointer data)
 {
@@ -39,7 +72,7 @@ static void option(GtkButton *button, gpointer data)
 	//       bdata->command);
 	system(bdata->command);
 }
-	 
+
 static void popup()
 {
 	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 3,
@@ -128,6 +161,8 @@ int main(int argc, char **argv)
 				"Use this configuration file", "name" },
 		{ "vertical", 'v', 0, G_OPTION_ARG_NONE, &vertical,
 				"Use vertical icon bar", NULL },
+		{ "alpha", 'a', 0, G_OPTION_ARG_DOUBLE, &background_alpha,
+				"Background window alpha", NULL },
 		{ NULL }
 	};
 
@@ -166,6 +201,15 @@ int main(int argc, char **argv)
 	/* end of tray icon stuff */
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+	/* next 4 functions are needed so we can set the transparency */
+	gtk_widget_set_app_paintable(window, TRUE);
+	g_signal_connect(G_OBJECT(window), "expose-event",
+			 G_CALLBACK(window_exposed), NULL);
+	g_signal_connect(G_OBJECT(window), "screen-changed",
+			 G_CALLBACK(screen_changed), NULL);
+	screen_changed(window, NULL, NULL);
+
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	box = vertical ? gtk_vbox_new(TRUE, TRUE) : gtk_hbox_new(TRUE, TRUE);
 
