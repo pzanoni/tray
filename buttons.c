@@ -97,7 +97,7 @@ static void click()
 	}
 }
 
-static void set_button(struct button_data *bdata, char *i)
+static void set_button(struct button_data *bdata, char *i, char *tooltip)
 {
 	bdata->gtk_button = gtk_button_new();
 	g_signal_connect(G_OBJECT(bdata->gtk_button), "clicked",
@@ -106,6 +106,8 @@ static void set_button(struct button_data *bdata, char *i)
 			     gtk_image_new_from_file(i));
 	gtk_button_set_image_position(GTK_BUTTON(bdata->gtk_button),
 				      GTK_POS_TOP);
+	if (tooltip)
+		gtk_widget_set_tooltip_text(bdata->gtk_button, tooltip);
 	gtk_container_add(GTK_CONTAINER(box), bdata->gtk_button);
 }
 
@@ -122,20 +124,27 @@ static int read_config(char *conf)
 		return -1;
 
 	for (i = 0; i < MAX_BUTTONS; i++) {
-		char *cmd, *icon;
+		char *cmd, *icon, *tooltip;
 
 		fgets(line, LINE_SIZE, f);
 		if (feof(f))
 			break;
 
 		cmd = strtok(line, "^");
-		icon = strtok(NULL, "\n");
+		icon = strtok(NULL, "^\n");
+		tooltip = strtok(NULL, "\n");
+		if (!cmd || !icon) {
+			fprintf(stderr, "Error parsing config file line %d\n",
+				i+1);
+			return -1;
+		}
 
 		if (debug)
-			printf("cmd=\"%s\", icon=\"%s\"\n", cmd, icon);
+			printf("cmd=\"%s\", icon=\"%s\", tooltip=\"%s\"\n",
+			       cmd, icon, tooltip);
 
 		buttons[i].command = strdup(cmd);
-		set_button(&buttons[i], icon);
+		set_button(&buttons[i], icon, tooltip);
 	}
 
 	num_buttons = i;
